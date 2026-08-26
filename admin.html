@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>NUMICS Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#F8F9FA;color:#111;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+button,input,textarea,select{font-family:inherit}
+
+/* ── LOGIN ── */
+#login{
+  position:fixed;inset:0;background:#fff;
+  display:flex;align-items:center;justify-content:center;
+  z-index:1000;
+}
+.login-box{
+  width:100%;max-width:380px;padding:0 24px;
+  display:flex;flex-direction:column;gap:20px;
+}
+.login-logo{
+  font-size:22px;font-weight:900;letter-spacing:-.03em;color:#111;
+  margin-bottom:8px;
+}
+.login-logo span{color:#22C55E}
+.login-title{font-size:14px;color:#6B7280;font-weight:400}
+.login-field{display:flex;flex-direction:column;gap:6px}
+.login-field label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#9CA3AF}
+.login-field input{
+  border:1.5px solid #E5E7EB;padding:12px 14px;font-size:14px;
+  border-radius:4px;outline:none;transition:border-color .2s;
+}
+.login-field input:focus{border-color:#22C55E}
+.login-btn{
+  background:#111;color:#fff;border:none;padding:13px;
+  font-size:13px;font-weight:700;letter-spacing:.06em;
+  text-transform:uppercase;cursor:pointer;border-radius:4px;
+  transition:background .2s;
+}
+.login-btn:hover{background:#22C55E}
+.login-err{font-size:12px;color:#EF4444;display:none}
+
+/* ── LAYOUT ── */
+#app{display:none;height:100vh;overflow:hidden}
+.layout{display:grid;grid-template-columns:240px 1fr;height:100vh}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  background:#0A0A0F;color:#fff;
+  display:flex;flex-direction:column;
+  overflow-y:auto;
+}
+.sidebar-logo{
+  padding:24px 20px 20px;
+  font-size:16px;font-weight:900;letter-spacing:-.02em;
+  border-bottom:1px solid rgba(255,255,255,.07);
+}
+.sidebar-logo span{color:#22C55E}
+.sidebar-nav{flex:1;padding:12px 0}
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 20px;font-size:13px;font-weight:500;
+  color:rgba(255,255,255,.5);cursor:pointer;
+  transition:background .15s,color .15s;
+  border-left:2px solid transparent;
+}
+.nav-item:hover{background:rgba(255,255,255,.04);color:rgba(255,255,255,.8)}
+.nav-item.active{
+  background:rgba(34,197,94,.08);color:#22C55E;
+  border-left-color:#22C55E;
+}
+.nav-item .nav-icon{font-size:15px;width:20px;text-align:center}
+.nav-section{
+  padding:16px 20px 6px;
+  font-size:9px;font-weight:700;letter-spacing:.18em;
+  text-transform:uppercase;color:rgba(255,255,255,.2);
+}
+.sidebar-foot{
+  padding:16px 20px;border-top:1px solid rgba(255,255,255,.07);
+  display:flex;flex-direction:column;gap:8px;
+}
+.logout-btn{
+  background:rgba(255,255,255,.06);color:rgba(255,255,255,.5);
+  border:none;padding:9px 14px;font-size:12px;font-weight:600;
+  cursor:pointer;border-radius:3px;text-align:left;
+  transition:background .2s;
+}
+.logout-btn:hover{background:rgba(239,68,68,.15);color:#EF4444}
+
+/* ── MAIN ── */
+.main{display:flex;flex-direction:column;overflow:hidden}
+.topbar{
+  background:#fff;border-bottom:1px solid #E5E7EB;
+  padding:0 32px;height:60px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;
+}
+.topbar-title{font-size:15px;font-weight:700;letter-spacing:-.01em}
+.topbar-actions{display:flex;gap:10px}
+.btn{
+  padding:9px 18px;font-size:12px;font-weight:700;
+  letter-spacing:.05em;text-transform:uppercase;
+  cursor:pointer;border-radius:3px;border:none;
+  transition:background .2s,color .2s;
+}
+.btn-primary{background:#22C55E;color:#fff}
+.btn-primary:hover{background:#16A34A}
+.btn-secondary{background:#F3F4F6;color:#111;border:1.5px solid #E5E7EB}
+.btn-secondary:hover{background:#E5E7EB}
+.btn-danger{background:#FEF2F2;color:#EF4444;border:1.5px solid #FECACA}
+.btn-danger:hover{background:#EF4444;color:#fff}
+.content{flex:1;overflow-y:auto;padding:32px}
+
+/* ── PANELS ── */
+.panel{display:none}
+.panel.active{display:block}
+
+/* ── CARDS ── */
+.card{
+  background:#fff;border:1.5px solid #E5E7EB;
+  border-radius:8px;margin-bottom:20px;overflow:hidden;
+}
+.card-head{
+  padding:16px 20px;border-bottom:1px solid #E5E7EB;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.card-title{font-size:13px;font-weight:700;letter-spacing:-.01em}
+.card-body{padding:20px}
+
+/* ── FORM FIELDS ── */
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.field:last-child{margin-bottom:0}
+.field label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#9CA3AF}
+.field input,.field textarea,.field select{
+  border:1.5px solid #E5E7EB;padding:10px 12px;font-size:13px;
+  border-radius:4px;outline:none;transition:border-color .2s;
+  background:#fff;color:#111;width:100%;
+}
+.field input:focus,.field textarea:focus{border-color:#22C55E}
+.field textarea{resize:vertical;min-height:80px;line-height:1.6}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.field-hint{font-size:11px;color:#9CA3AF;margin-top:2px}
+
+/* ── IMAGE UPLOAD ── */
+.img-upload{
+  border:2px dashed #E5E7EB;border-radius:6px;
+  padding:24px;text-align:center;cursor:pointer;
+  transition:border-color .2s,background .2s;
+  position:relative;
+}
+.img-upload:hover{border-color:#22C55E;background:#F0FDF4}
+.img-upload input[type=file]{
+  position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;
+}
+.img-upload-icon{font-size:28px;margin-bottom:8px}
+.img-upload-text{font-size:12px;color:#6B7280;font-weight:500}
+.img-upload-hint{font-size:11px;color:#9CA3AF;margin-top:4px}
+.img-preview{
+  width:100%;max-height:160px;object-fit:cover;
+  border-radius:4px;margin-top:12px;display:none;
+}
+
+/* ── BLOG POSTS ── */
+.post-list{display:flex;flex-direction:column;gap:0}
+.post-item{
+  display:grid;grid-template-columns:1fr auto;
+  gap:16px;align-items:center;
+  padding:14px 20px;border-bottom:1px solid #E5E7EB;
+  transition:background .15s;
+}
+.post-item:last-child{border-bottom:none}
+.post-item:hover{background:#FAFAFA}
+.post-item-title{font-size:13px;font-weight:600;color:#111;margin-bottom:3px}
+.post-item-meta{font-size:11px;color:#9CA3AF}
+.post-item-meta span{
+  display:inline-block;background:#F3F4F6;
+  padding:2px 8px;border-radius:20px;margin-right:6px;
+  font-weight:500;
+}
+.post-actions{display:flex;gap:8px}
+.icon-btn{
+  width:30px;height:30px;border-radius:4px;border:1.5px solid #E5E7EB;
+  background:#fff;cursor:pointer;display:flex;align-items:center;
+  justify-content:center;font-size:13px;transition:all .15s;
+}
+.icon-btn:hover{border-color:#22C55E;background:#F0FDF4}
+.icon-btn.del:hover{border-color:#EF4444;background:#FEF2F2}
+
+/* ── BLOG EDITOR ── */
+.editor-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);
+  z-index:500;align-items:center;justify-content:center;
+}
+.editor-overlay.open{display:flex}
+.editor-box{
+  background:#fff;width:100%;max-width:900px;max-height:92vh;
+  border-radius:10px;overflow:hidden;
+  display:flex;flex-direction:column;
+}
+
+/* Article content editor */
+.art-editor-tabs{
+  display:flex;border-bottom:1px solid #E5E7EB;
+  background:#FAFAFA;flex-shrink:0;
+}
+.art-tab{
+  padding:10px 20px;font-size:12px;font-weight:600;
+  letter-spacing:.04em;cursor:pointer;color:#9CA3AF;
+  border-bottom:2px solid transparent;margin-bottom:-1px;
+  transition:color .2s,border-color .2s;
+}
+.art-tab.active{color:#22C55E;border-color:#22C55E}
+.art-tab-panel{display:none}
+.art-tab-panel.active{display:block}
+.art-content-area{
+  width:100%;min-height:280px;
+  border:1.5px solid #E5E7EB;border-radius:4px;
+  padding:14px;font-size:13px;line-height:1.75;
+  font-family:'Inter',sans-serif;color:#111;
+  resize:vertical;outline:none;
+  transition:border-color .2s;
+}
+.art-content-area:focus{border-color:#22C55E}
+.art-ref{
+  background:#F8F9FA;border:1.5px solid #E5E7EB;
+  border-radius:6px;padding:16px;
+  font-size:11px;line-height:2;color:#6B7280;
+  font-family:monospace;
+}
+.editor-head{
+  padding:18px 24px;border-bottom:1px solid #E5E7EB;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;
+}
+.editor-head-title{font-size:14px;font-weight:700}
+.editor-close{
+  width:28px;height:28px;border-radius:4px;border:none;
+  background:#F3F4F6;cursor:pointer;font-size:16px;
+  display:flex;align-items:center;justify-content:center;
+}
+.editor-body{padding:24px;overflow-y:auto;flex:1}
+.editor-foot{
+  padding:16px 24px;border-top:1px solid #E5E7EB;
+  display:flex;gap:10px;justify-content:flex-end;flex-shrink:0;
+}
+
+/* ── KINETIC ITEMS ── */
+.kt-item{
+  display:grid;grid-template-columns:auto 1fr 1fr;
+  gap:12px;align-items:center;
+  padding:12px 0;border-bottom:1px solid #E5E7EB;
+}
+.kt-item:last-child{border-bottom:none}
+.kt-num{
+  font-size:11px;font-weight:700;letter-spacing:.1em;
+  color:#22C55E;width:24px;
+}
+.kt-input{
+  border:1.5px solid #E5E7EB;padding:8px 10px;font-size:12px;
+  border-radius:4px;outline:none;width:100%;
+  transition:border-color .2s;
+}
+.kt-input:focus{border-color:#22C55E}
+
+/* ── SERVICE ITEMS ── */
+.svc-domain{
+  border:1.5px solid #E5E7EB;border-radius:6px;
+  margin-bottom:16px;overflow:hidden;
+}
+.svc-domain-head{
+  padding:12px 16px;background:#F8F9FA;
+  border-bottom:1px solid #E5E7EB;
+  font-size:12px;font-weight:700;letter-spacing:.06em;
+  text-transform:uppercase;color:#6B7280;
+}
+.svc-domain-body{padding:16px}
+.svc-disc-item{
+  display:grid;grid-template-columns:auto 1fr 1fr;
+  gap:10px;align-items:start;
+  padding:10px 0;border-bottom:1px solid #F3F4F6;
+}
+.svc-disc-item:last-child{border-bottom:none}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:24px;right:24px;
+  background:#111;color:#fff;
+  padding:12px 20px;border-radius:6px;
+  font-size:13px;font-weight:500;
+  transform:translateY(80px);opacity:0;
+  transition:transform .3s ease,opacity .3s ease;
+  z-index:999;display:flex;align-items:center;gap:8px;
+}
+.toast.show{transform:translateY(0);opacity:1}
+.toast-dot{width:6px;height:6px;border-radius:50%;background:#22C55E;flex-shrink:0}
+
+/* ── STATS GRID ── */
+.stats-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px;
+}
+.stat-card{
+  background:#fff;border:1.5px solid #E5E7EB;border-radius:8px;
+  padding:20px;
+}
+.stat-card-n{font-size:28px;font-weight:900;letter-spacing:-.03em;color:#111;margin-bottom:4px}
+.stat-card-l{font-size:11px;font-weight:500;color:#9CA3AF;text-transform:uppercase;letter-spacing:.06em}
+
+/* ── RICH TEXT EDITOR ── */
+.rte-toolbar{
+  display:flex;align-items:center;flex-wrap:wrap;gap:3px;
+  padding:8px 10px;background:#F8F9FA;
+  border:1.5px solid #E5E7EB;border-bottom:none;
+  border-radius:4px 4px 0 0;
+}
+.rte-btn{
+  min-width:28px;height:28px;padding:0 6px;
+  border:1.5px solid transparent;border-radius:3px;
+  background:transparent;cursor:pointer;
+  font-size:12px;font-weight:700;color:#374151;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .15s,border-color .15s;
+}
+.rte-btn:hover{background:#E5E7EB;border-color:#D1D5DB}
+.rte-green-btn{color:#22C55E;border-color:#BBF7D0;background:#F0FDF4}
+.rte-green-btn:hover{background:#22C55E;color:#fff;border-color:#22C55E}
+.rte-select{
+  height:28px;padding:0 6px;font-size:11px;font-weight:600;
+  border:1.5px solid #E5E7EB;border-radius:3px;
+  background:#fff;color:#374151;cursor:pointer;outline:none;
+}
+.rte-color-wrap{
+  position:relative;width:28px;height:28px;
+  display:flex;align-items:center;justify-content:center;
+  border:1.5px solid #E5E7EB;border-radius:3px;
+  cursor:pointer;overflow:hidden;background:#fff;
+}
+.rte-color{
+  position:absolute;opacity:0;width:100%;height:100%;cursor:pointer;
+}
+.rte-sep{width:1px;height:20px;background:#E5E7EB;margin:0 2px;flex-shrink:0}
+.rte-area{
+  border:1.5px solid #E5E7EB;border-radius:0 0 4px 4px;
+  min-height:320px;max-height:420px;overflow-y:auto;
+  padding:16px;font-size:15px;line-height:1.8;
+  font-family:'Inter',sans-serif;color:#111;
+  outline:none;transition:border-color .2s;
+}
+.rte-area:focus{border-color:#22C55E}
+.rte-area:empty::before{
+  content:attr(data-placeholder);
+  color:#9CA3AF;pointer-events:none;
+}
+.rte-area h2{font-size:22px;font-weight:800;letter-spacing:-.02em;margin:20px 0 8px;color:#111}
+.rte-area h3{font-size:17px;font-weight:700;margin:16px 0 6px;color:#111}
+.rte-area h4{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9CA3AF;margin:14px 0 4px}
+.rte-area p{margin-bottom:12px}
+.rte-area blockquote{border-left:3px solid #22C55E;padding-left:16px;margin:16px 0;color:#6B7280;font-style:italic}
+.rte-area ul{padding-left:20px;margin-bottom:12px}
+.rte-area ol{padding-left:20px;margin-bottom:12px}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#E5E7EB;border-radius:4px}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login">
+  <div class="login-box">
+    <div>
+      <div class="login-logo">NUMICS<span>.</span></div>
+      <div class="login-title">Admin Panel — sign in to continue</div>
+    </div>
+    <div class="login-field">
+      <label>Password</label>
+      <input type="password" id="pwInput" placeholder="Enter password" autocomplete="current-password">
+    </div>
+    <div class="login-err" id="loginErr">Incorrect password. Try again.</div>
+    <button class="login-btn" onclick="doLogin()">Sign In</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">NUMICS<span>.</span></div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Content</div>
+      <div class="nav-item active" onclick="showPanel('dashboard')">
+        <span class="nav-icon">◉</span> Dashboard
+      </div>
+      <div class="nav-item" onclick="showPanel('hero')">
+        <span class="nav-icon">⬡</span> Hero
+      </div>
+      <div class="nav-item" onclick="showPanel('kinetic')">
+        <span class="nav-icon">⟳</span> Kinetic Text
+      </div>
+      <div class="nav-item" onclick="showPanel('about')">
+        <span class="nav-icon">◎</span> About
+      </div>
+      <div class="nav-item" onclick="showPanel('services')">
+        <span class="nav-icon">⬢</span> Services
+      </div>
+      <div class="nav-item" onclick="showPanel('blog')">
+        <span class="nav-icon">✦</span> Blog / Insights
+      </div>
+      <div class="nav-item" onclick="showPanel('contact')">
+        <span class="nav-icon">◌</span> Contact
+      </div>
+    </nav>
+    <div class="sidebar-foot">
+      <button class="logout-btn" onclick="doLogout()">← Sign out</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="topbarTitle">Dashboard</div>
+      <div class="topbar-actions">
+        <button class="btn btn-secondary" onclick="saveAll()">Save Changes</button>
+        <button class="btn btn-primary" onclick="exportSite()">Export All Files ↓</button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <div class="panel active" id="panel-dashboard">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-card-n" id="ds-posts">0</div>
+            <div class="stat-card-l">Blog posts</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-n" id="ds-sections">7</div>
+            <div class="stat-card-l">Sections</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-n" id="ds-saved">—</div>
+            <div class="stat-card-l">Last saved</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="card-title">Quick Guide</div></div>
+          <div class="card-body">
+            <p style="font-size:13px;line-height:1.75;color:#6B7280">
+              <strong style="color:#111">How to edit:</strong> Select a section from the left sidebar → edit any field → click <strong>Save Changes</strong>.<br><br>
+              <strong style="color:#111">How to publish:</strong> Click <strong>Export Site ↓</strong> → download <code style="background:#F3F4F6;padding:2px 6px;border-radius:3px">index.html</code> → upload to Netlify Drop.<br><br>
+              <strong style="color:#111">Blog posts:</strong> Go to Blog / Insights → Add New Post → fill in the fields → Save.<br><br>
+              <strong style="color:#111">Images:</strong> Click the image upload area in any section → select your file → it saves automatically.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- HERO -->
+      <div class="panel" id="panel-hero">
+        <div class="card">
+          <div class="card-head"><div class="card-title">Hero Section — Text</div></div>
+          <div class="card-body">
+            <div class="field">
+              <label>Pre-text (white text before Shift)</label>
+              <input type="text" id="h-pre" placeholder="Sustainability is a">
+              <div class="field-hint">White text that appears before "Shift." in the hero</div>
+            </div>
+            <div class="field">
+              <label>Tagline</label>
+              <input type="text" id="h-tag" placeholder="We are the architects.">
+            </div>
+            <div class="field">
+              <label>CTA Button Text</label>
+              <input type="text" id="h-cta" placeholder="Request a Consultation">
+            </div>
+            <div class="field">
+              <label>CTA Button Link</label>
+              <input type="text" id="h-link" placeholder="https://cal.com/your-link">
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div class="card-title">Hero Background — Video</div></div>
+          <div class="card-body">
+            <div class="field">
+              <label>Video File Name</label>
+              <input type="text" id="h-video" placeholder="hero-video.mp4">
+              <div class="field-hint">Place your .mp4 file in the same folder as index.html. Enter the filename here exactly — e.g. <code style="background:#F3F4F6;padding:2px 6px;border-radius:3px">hero-video.mp4</code></div>
+            </div>
+            <div class="field">
+              <label>Canvas Overlay Opacity</label>
+              <input type="range" id="h-opacity" min="0" max="1" step="0.05" value="0.55"
+                style="width:100%;accent-color:#22C55E"
+                oninput="document.getElementById('h-opacity-val').textContent=this.value">
+              <div class="field-hint">Current: <strong id="h-opacity-val">0.55</strong> — lower = more video visible, higher = more particles visible</div>
+            </div>
+            <div style="background:#F0FDF4;border:1.5px solid #BBF7D0;border-radius:6px;padding:16px;margin-top:4px">
+              <p style="font-size:12px;color:#166534;line-height:1.7;margin:0">
+                <strong>How it works:</strong> The video plays behind the hero text. The green particle canvas sits on top at the opacity you set above. After saving and exporting, both will appear together — video underneath, animation on top.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div class="card-title">Hero Background — Image (alternative to video)</div></div>
+          <div class="card-body">
+            <div class="field">
+              <label>Background Image</label>
+              <div class="img-upload">
+                <div class="img-upload-icon">🖼</div>
+                <div class="img-upload-text">Click to upload or drag & drop</div>
+                <div class="img-upload-hint">JPG, PNG — recommended 1920×1080px minimum</div>
+                <input type="file" accept="image/*" onchange="handleImg(this,'h-bg-img','h-bg-prev')">
+                <img id="h-bg-prev" class="img-preview">
+              </div>
+              <input type="hidden" id="h-bg-img">
+              <div class="field-hint" style="margin-top:8px">Use either video OR image — not both. Video takes priority if both are set.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- KINETIC -->
+      <div class="panel" id="panel-kinetic">
+        <div class="card">
+          <div class="card-head"><div class="card-title">Kinetic Typography — "Where X meets Y" Statements</div></div>
+          <div class="card-body">
+            <p style="font-size:12px;color:#9CA3AF;margin-bottom:16px">Edit the six rotating statements. Each has a left word and a right word in green.</p>
+            <div id="kt-list"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="card-title">Final Statement</div></div>
+          <div class="card-body">
+            <div class="field-row">
+              <div class="field">
+                <label>Top line</label>
+                <input type="text" id="kt-final-top" placeholder="Where all of it meets">
+              </div>
+              <div class="field">
+                <label>Bottom line</label>
+                <input type="text" id="kt-final-bot" placeholder="The Bottom Line">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ABOUT -->
+      <div class="panel" id="panel-about">
+        <div class="card">
+          <div class="card-head"><div class="card-title">Headline</div></div>
+          <div class="card-body">
+            <div class="field">
+              <label>Main heading (line 1)</label>
+              <input type="text" id="ab-h1" placeholder="We transform complexity">
+            </div>
+            <div class="field">
+              <label>Main heading (line 2 — green)</label>
+              <input type="text" id="ab-h2" placeholder="into better decisions.">
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="card-title">Stats</div></div>
+          <div class="card-body">
+            <div class="field-row">
+              <div class="field">
+                <label>Stat 1 — Number</label>
+                <input type="text" id="ab-s1n" placeholder="7+">
+              </div>
+              <div class="field">
+                <label>Stat 1 — Label</label>
+                <input type="text" id="ab-s1l" placeholder="Years cross-sector experience">
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label>Stat 2 — Number</label>
+                <input type="text" id="ab-s2n" placeholder="3">
+              </div>
+              <div class="field">
+                <label>Stat 2 — Label</label>
+                <input type="text" id="ab-s2l" placeholder="Continents of project work">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="card-title">Statement Section</div></div>
+          <div class="card-body">
+            <div class="field">
+              <label>Paragraph 1</label>
+              <textarea id="ab-p1"></textarea>
+            </div>
+            <div class="field">
+              <label>Paragraph 2</label>
+              <textarea id="ab-p2"></textarea>
+            </div>
+            <div class="field">
+              <label>Pull quote (right side)</label>
+              <input type="text" id="ab-pull" placeholder="We begin with the question.">
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="card-title">Founder Section</div></div>
+          <div class="card-body">
+            <div class="field">
+              <label>Section eyebrow</label>
+              <input type="text" id="ab-fw-ey" placeholder="How it started">
+            </div>
+            <div class="field">
+              <label>Section headline</label>
+              <input type="text" id="ab-fw-h" placeholder="One founder, one conviction.">
+            </div>
+            <div class="field">
+              <label>Paragraph 1</label>
+              <textarea id="ab-fw-p1"></textarea>
+            </div>
+            <div class="field">
+              <label>Paragraph 2</label>
+              <textarea id="ab-fw-p2"></textarea>
+            </div>
+            <div class="field">
+              <label>Paragraph 3</label>
+              <textarea id="ab-fw-p3"></textarea>
+            </div>
+            <div class="field">
+              <label>Founder Photo 1 (back card)</label>
+              <div class="img-upload" id="ab-img1-wrap">
+                <div class="img-upload-icon">🖼</div>
+                <div class="img-upload-text">Click to upload or drag & drop</div>
+                <div class="img-upload-hint">JPG, PNG — recommended 600×800px</div>
+                <input type="file" accept="image/*" onchange="handleImg(this,'ab-img1','ab-img1-prev')">
+                <img id="ab-img1-prev" class="img-preview">
+              </div>
+              <input type="hidden" id="ab-img1">
+            </div>
+            <div class="field">
+              <label>Founder Photo 2 (front card)</label>
+              <div class="img-upload">
+                <div class="img-upload-icon">🖼</div>
+                <div class="img-upload-text">Click to upload or drag & drop</div>
+                <div class="img-upload-hint">JPG, PNG — recommended 600×800px</div>
+                <input type="file" accept="image/*" onchange="handleImg(this,'ab-img2','ab-img2-prev')">
+                <img id="ab-img2-prev" class="img-preview">
+              </div>
+              <input type="hidden" id="ab-img2">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SERVICES -->
+      <div class="panel" id="panel-services">
+        <div class="svc-domain">
+          <div class="svc-domain-head">Domain 1 — Europe</div>
+          <div class="svc-domain-body">
+            <div class="field">
+              <label>Domain name</label>
+              <input type="text" id="sv-d1-name" placeholder="Europe">
+            </div>
+            <div class="field">
+              <label>Sub-paragraph</label>
+              <textarea id="sv-d1-sub"></textarea>
+            </div>
+            <div id="sv-d1-discs"></div>
+          </div>
+        </div>
+        <div class="svc-domain">
+          <div class="svc-domain-head">Domain 2 — Global South</div>
+          <div class="svc-domain-body">
+            <div class="field">
+              <label>Domain name</label>
+              <input type="text" id="sv-d2-name" placeholder="Global South">
+            </div>
+            <div class="field">
+              <label>Sub-paragraph</label>
+              <textarea id="sv-d2-sub"></textarea>
+            </div>
+            <div id="sv-d2-discs"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            <div class="field">
+              <label>Convergence line text</label>
+              <input type="text" id="sv-converge" placeholder="Both converge into one capability — NUMICS.">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BLOG -->
+      <div class="panel" id="panel-blog">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:16px">
+          <button class="btn btn-primary" onclick="openEditor(-1)">+ Add New Post</button>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="card-title">All Posts</div></div>
+          <div class="post-list" id="post-list"></div>
+        </div>
+      </div>
+
+      <!-- CONTACT -->
+      <div class="panel" id="panel-contact">
+        <div class="card">
+          <div class="card-head"><div class="card-title">Contact Section</div></div>
+          <div class="card-body">
+            <div class="field">
+              <label>Headline</label>
+              <input type="text" id="ct-h" placeholder="Ready to begin with the right question?">
+            </div>
+            <div class="field">
+              <label>Sub-line</label>
+              <input type="text" id="ct-sub" placeholder="Every engagement starts with a 30-minute conversation.">
+            </div>
+            <div class="field">
+              <label>CTA Button Text</label>
+              <input type="text" id="ct-btn" placeholder="Request a Conversation">
+            </div>
+            <div class="field">
+              <label>CTA Button Link (Cal.com URL)</label>
+              <input type="text" id="ct-link" placeholder="https://cal.com/your-link">
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label>Email address</label>
+                <input type="text" id="ct-email" placeholder="hello@numics.de">
+              </div>
+              <div class="field">
+                <label>LinkedIn URL</label>
+                <input type="text" id="ct-li" placeholder="https://linkedin.com/company/numics">
+              </div>
+            </div>
+            <div class="field">
+              <label>Location</label>
+              <input type="text" id="ct-loc" placeholder="Ruhr Region, Germany">
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="card-title">Footer</div></div>
+          <div class="card-body">
+            <div class="field">
+              <label>Copyright text</label>
+              <input type="text" id="ct-copy" placeholder="© 2025 NUMICS. All rights reserved.">
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end content -->
+  </main>
+</div>
+</div><!-- end app -->
+
+<!-- BLOG EDITOR OVERLAY -->
+<div class="editor-overlay" id="editorOverlay">
+  <div class="editor-box">
+    <div class="editor-head">
+      <div class="editor-head-title" id="editorTitle">New Post</div>
+      <button class="editor-close" onclick="closeEditor()">✕</button>
+    </div>
+    <div class="art-editor-tabs">
+      <div class="art-tab active" onclick="switchTab(this,'tab-meta')">① Details</div>
+      <div class="art-tab" onclick="switchTab(this,'tab-content')">② Write Article</div>
+    </div>
+    <div class="editor-body">
+
+      <!-- TAB 1: META -->
+      <div class="art-tab-panel active" id="tab-meta">
+        <div class="field">
+          <label>Article Title</label>
+          <input type="text" id="ed-title" placeholder="Enter your article title here">
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Category</label>
+            <select id="ed-cat">
+              <option>Regulatory Analysis</option>
+              <option>Climate Finance</option>
+              <option>Strategic Intelligence</option>
+              <option>Supply Chain</option>
+              <option>Research</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Date</label>
+            <input type="text" id="ed-date" placeholder="June 2026">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Read time</label>
+            <input type="text" id="ed-time" placeholder="7 min">
+          </div>
+          <div class="field">
+            <label>Article filename</label>
+            <input type="text" id="ed-url" placeholder="articles/my-article.html">
+            <div class="field-hint">e.g. articles/csrd-2026.html</div>
+          </div>
+        </div>
+        <div class="field">
+          <label>Short excerpt (shown on homepage card)</label>
+          <textarea id="ed-excerpt" style="min-height:56px" placeholder="One or two sentences about this article. Shown on the blog card on the homepage."></textarea>
+        </div>
+        <div class="field">
+          <label>Cover Image</label>
+          <div class="img-upload">
+            <div class="img-upload-icon">🖼</div>
+            <div class="img-upload-text">Click to upload or drag & drop</div>
+            <div class="img-upload-hint">JPG, PNG — recommended 800×600px</div>
+            <input type="file" accept="image/*" onchange="handleImg(this,'ed-img','ed-img-prev')">
+            <img id="ed-img-prev" class="img-preview">
+          </div>
+          <input type="hidden" id="ed-img">
+        </div>
+      </div>
+
+      <!-- TAB 2: RICH TEXT EDITOR -->
+      <div class="art-tab-panel" id="tab-content">
+
+        <!-- Toolbar -->
+        <div class="rte-toolbar">
+
+          <!-- Text style -->
+          <select class="rte-select" onchange="rteBlock(this.value);this.value='p'" title="Text style">
+            <option value="p">Paragraph</option>
+            <option value="h2">Heading 1</option>
+            <option value="h3">Heading 2</option>
+            <option value="h4">Label</option>
+            <option value="blockquote">Quote</option>
+          </select>
+
+          <!-- Font size -->
+          <select class="rte-select" onchange="rteSize(this.value);this.value=''" title="Font size">
+            <option value="">Size</option>
+            <option value="12px">Small</option>
+            <option value="15px">Normal</option>
+            <option value="18px">Medium</option>
+            <option value="22px">Large</option>
+            <option value="28px">X-Large</option>
+          </select>
+
+          <div class="rte-sep"></div>
+
+          <!-- Format buttons -->
+          <button class="rte-btn" onclick="rteCmd('bold')" title="Bold"><b>B</b></button>
+          <button class="rte-btn" onclick="rteCmd('italic')" title="Italic"><i>I</i></button>
+          <button class="rte-btn" onclick="rteCmd('underline')" title="Underline"><u>U</u></button>
+          <button class="rte-btn" onclick="rteCmd('strikeThrough')" title="Strikethrough"><s>S</s></button>
+
+          <div class="rte-sep"></div>
+
+          <!-- Color -->
+          <div class="rte-color-wrap" title="Text color">
+            <span style="font-size:11px;font-weight:600;color:#6B7280">A</span>
+            <input type="color" class="rte-color" value="#111111" onchange="rteCmd('foreColor',this.value)" title="Text color">
+          </div>
+          <div class="rte-color-wrap" title="Highlight color">
+            <span style="font-size:11px;font-weight:600;background:#FEF08A;padding:0 2px">A</span>
+            <input type="color" class="rte-color" value="#FEF08A" onchange="rteCmd('hiliteColor',this.value)" title="Highlight color">
+          </div>
+
+          <!-- Green accent -->
+          <button class="rte-btn rte-green-btn" onclick="rteGreen()" title="NUMICS Green">G</button>
+
+          <div class="rte-sep"></div>
+
+          <!-- Alignment -->
+          <button class="rte-btn" onclick="rteCmd('justifyLeft')" title="Align left">⬅</button>
+          <button class="rte-btn" onclick="rteCmd('justifyCenter')" title="Center">↔</button>
+          <button class="rte-btn" onclick="rteCmd('justifyRight')" title="Align right">➡</button>
+
+          <div class="rte-sep"></div>
+
+          <!-- Lists -->
+          <button class="rte-btn" onclick="rteCmd('insertUnorderedList')" title="Bullet list">• —</button>
+          <button class="rte-btn" onclick="rteCmd('insertOrderedList')" title="Numbered list">1.</button>
+
+          <div class="rte-sep"></div>
+
+          <!-- Indent -->
+          <button class="rte-btn" onclick="rteCmd('outdent')" title="Outdent">⇤</button>
+          <button class="rte-btn" onclick="rteCmd('indent')" title="Indent">⇥</button>
+
+          <div class="rte-sep"></div>
+
+          <!-- Clear -->
+          <button class="rte-btn" onclick="rteCmd('removeFormat')" title="Clear formatting" style="color:#EF4444">✕</button>
+        </div>
+
+        <!-- Editable area -->
+        <div class="rte-area" id="ed-rte" contenteditable="true"
+          data-placeholder="Paste or type your article here. Select text to format it using the toolbar above. You can paste directly from Word or PDF — then use the toolbar to style it.">
+        </div>
+
+        <!-- Hidden storage -->
+        <textarea id="ed-body" style="display:none"></textarea>
+
+      </div>
+
+    </div>
+    <div class="editor-foot">
+      <button class="btn btn-danger" id="edDelBtn" onclick="deletePost()">Delete</button>
+      <button class="btn btn-secondary" onclick="closeEditor()">Cancel</button>
+      <button class="btn btn-primary" onclick="savePost()">Save Post</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <div class="toast-dot"></div>
+  <span id="toastMsg">Saved</span>
+</div>
+
+<script>
+/* ══════════════════════════════════════════
+   NUMICS ADMIN PANEL
+   Password: numics2025
+   Change below to update password
+══════════════════════════════════════════ */
+
+const PASSWORD = 'numics2025';
+
+/* ── AUTH ── */
+function doLogin(){
+  const pw = document.getElementById('pwInput').value;
+  if(pw === PASSWORD){
+    document.getElementById('login').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    loadAll();
+    toast('Welcome back.');
+  } else {
+    document.getElementById('loginErr').style.display = 'block';
+    document.getElementById('pwInput').value = '';
+  }
+}
+document.getElementById('pwInput').addEventListener('keydown', e => {
+  if(e.key === 'Enter') doLogin();
+});
+function doLogout(){
+  document.getElementById('login').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+}
+
+/* ── NAVIGATION ── */
+const panels = ['dashboard','hero','kinetic','about','services','blog','contact'];
+const titles = {
+  dashboard:'Dashboard', hero:'Hero Section',
+  kinetic:'Kinetic Typography', about:'About Section',
+  services:'Services', blog:'Blog / Insights', contact:'Contact & Footer'
+};
+function showPanel(id){
+  panels.forEach(p => {
+    document.getElementById('panel-'+p).classList.toggle('active', p===id);
+  });
+  document.querySelectorAll('.nav-item').forEach(n => {
+    n.classList.toggle('active', n.textContent.trim().toLowerCase().includes(id) || (id==='dashboard' && n.textContent.includes('Dashboard')));
+  });
+  document.getElementById('topbarTitle').textContent = titles[id]||id;
+  if(id==='blog') renderPosts();
+}
+
+/* ── DATA ── */
+const DATA = {
+  hero:{ pre:'Sustainability is a', tag:'We are the architects.', cta:'Request a Consultation', link:'', video:'', videoOpacity:'0.55', bgImg:'' },
+  kinetic:{
+    stmts:[
+      {l:'Regulation', r:'Revenue'},
+      {l:'Data', r:'Decisions'},
+      {l:'Efficiency', r:'Growth'},
+      {l:'Sustainability', r:'Profit'},
+      {l:'Risk', r:'Opportunity'},
+      {l:'Complexity', r:'Action'},
+    ],
+    finalTop:'Where all of it meets',
+    finalBot:'The Bottom Line',
+  },
+  about:{
+    h1:'We transform complexity', h2:'into better decisions.',
+    s1n:'7+', s1l:'Years cross-sector experience',
+    s2n:'3',  s2l:'Continents of project work',
+    p1:'NUMICS is a founder-led strategic intelligence firm based in the Ruhr Region, Germany. We work at the intersection of EU sustainability regulation, climate finance, data and emerging market project development.',
+    p2:"We don't begin with a predefined answer. We investigate, challenge assumptions, and turn evidence into decisions that move ideas forward.",
+    pull:'We begin with the question.',
+    fwEy:'How it started', fwH:'One founder, one conviction.',
+    fwP1:'Waqar Ahmed has always been driven by one question: how can technical expertise and strategic intelligence solve problems that actually matter?',
+    fwP2:'The sustainability transition is the defining business challenge of this decade. Most firms treat it as a compliance problem. Waqar saw it as a decision problem — and built NUMICS to address it differently.',
+    fwP3:'NUMICS is not built around a service catalogue. It is built around a specific accumulation of expertise — regulatory depth, quantitative rigour, global project experience and AI-augmented intelligence.',
+    img1:'', img2:'',
+  },
+  services:{
+    d1Name:'Europe',
+    d1Sub:'EU regulatory depth — from Taxonomy to CSDDD — translated into decisions that move organisations forward.',
+    d1Discs:[
+      {name:'Sustainable Finance & ESG', tags:'EU Taxonomy · CSRD · SFDR · PAIs · PCAF'},
+      {name:'Climate & Sustainability Strategy', tags:'SBTi · TCFD · GHG Protocol · TNFD · VSME'},
+      {name:'Human Rights & Supply Chain', tags:'LkSG · CSDDD · EUDR · OECD · ILO'},
+    ],
+    d2Name:'Global South',
+    d2Sub:'On-the-ground intelligence across Africa, South Asia and beyond — where European capital meets emerging market reality.',
+    d2Discs:[
+      {name:'Project Development & Feasibility', tags:'Climate Finance · Feasibility Studies · Investment Readiness'},
+      {name:'Renewable Energy & Waste', tags:'Biogas · Solar · Circular Economy · Waste Management'},
+      {name:'Research & Market Intelligence', tags:'Market Research · Socio-economic Analysis · Development Finance'},
+    ],
+    converge:'Both converge into one capability — NUMICS.',
+  },
+  contact:{
+    h:'Ready to begin with the right question?',
+    sub:'Every engagement starts with a 30-minute conversation.',
+    btn:'Request a Conversation',
+    link:'',
+    email:'hello@numics.de',
+    li:'https://linkedin.com/company/numics',
+    loc:'Ruhr Region, Germany',
+    copy:'© 2025 NUMICS. All rights reserved.',
+  },
+  posts:[
+    {id:1, title:'CSRD Year One: What the first wave of mandatory disclosures reveals', cat:'Regulatory Analysis', date:'June 2026', time:'9 min', url:'articles/csrd-year-one.html', img:''},
+    {id:2, title:'The investment readiness gap in Global South renewable energy projects', cat:'Climate Finance', date:'May 2026', time:'7 min', url:'articles/global-south-investment.html', img:''},
+    {id:3, title:'EU Taxonomy alignment as portfolio strategy, not compliance exercise', cat:'Strategic Intelligence', date:'April 2026', time:'6 min', url:'articles/eu-taxonomy-strategy.html', img:''},
+  ],
+};
+
+/* ── LOAD ── */
+function loadAll(){
+  const saved = localStorage.getItem('numics_admin');
+  if(saved){ try{ Object.assign(DATA, JSON.parse(saved)); }catch(e){} }
+
+  /* Hero */
+  v('h-pre', DATA.hero.pre); v('h-tag', DATA.hero.tag);
+  v('h-cta', DATA.hero.cta); v('h-link', DATA.hero.link);
+  v('h-video', DATA.hero.video||'');
+  const opEl = document.getElementById('h-opacity');
+  const opVal = document.getElementById('h-opacity-val');
+  if(opEl){ opEl.value = DATA.hero.videoOpacity||'0.55'; }
+  if(opVal){ opVal.textContent = DATA.hero.videoOpacity||'0.55'; }
+  if(DATA.hero.bgImg){ showPrev('h-bg-prev', DATA.hero.bgImg); }
+
+  /* Kinetic */
+  buildKtList();
+  v('kt-final-top', DATA.kinetic.finalTop);
+  v('kt-final-bot', DATA.kinetic.finalBot);
+
+  /* About */
+  v('ab-h1', DATA.about.h1); v('ab-h2', DATA.about.h2);
+  v('ab-s1n', DATA.about.s1n); v('ab-s1l', DATA.about.s1l);
+  v('ab-s2n', DATA.about.s2n); v('ab-s2l', DATA.about.s2l);
+  v('ab-p1', DATA.about.p1); v('ab-p2', DATA.about.p2);
+  v('ab-pull', DATA.about.pull);
+  v('ab-fw-ey', DATA.about.fwEy); v('ab-fw-h', DATA.about.fwH);
+  v('ab-fw-p1', DATA.about.fwP1);
+  v('ab-fw-p2', DATA.about.fwP2);
+  v('ab-fw-p3', DATA.about.fwP3);
+  if(DATA.about.img1){ showPrev('ab-img1-prev', DATA.about.img1); }
+  if(DATA.about.img2){ showPrev('ab-img2-prev', DATA.about.img2); }
+
+  /* Services */
+  v('sv-d1-name', DATA.services.d1Name);
+  v('sv-d1-sub',  DATA.services.d1Sub);
+  v('sv-d2-name', DATA.services.d2Name);
+  v('sv-d2-sub',  DATA.services.d2Sub);
+  v('sv-converge',DATA.services.converge);
+  buildDiscList('sv-d1-discs', DATA.services.d1Discs, 1);
+  buildDiscList('sv-d2-discs', DATA.services.d2Discs, 2);
+
+  /* Contact */
+  v('ct-h', DATA.contact.h); v('ct-sub', DATA.contact.sub);
+  v('ct-btn', DATA.contact.btn); v('ct-link', DATA.contact.link);
+  v('ct-email', DATA.contact.email); v('ct-li', DATA.contact.li);
+  v('ct-loc', DATA.contact.loc); v('ct-copy', DATA.contact.copy);
+
+  /* Dashboard */
+  document.getElementById('ds-posts').textContent = DATA.posts.length;
+  updateLastSaved();
+}
+
+function v(id, val){ const el=document.getElementById(id); if(el) el.value=val||''; }
+function g(id){ const el=document.getElementById(id); return el?el.value:''; }
+function showPrev(prevId, src){ const el=document.getElementById(prevId); if(el&&src){el.src=src;el.style.display='block';} }
+
+/* ── KINETIC LIST ── */
+function buildKtList(){
+  const c = document.getElementById('kt-list');
+  if(!c) return;
+  c.innerHTML = DATA.kinetic.stmts.map((s,i)=>`
+    <div class="kt-item">
+      <span class="kt-num">0${i+1}</span>
+      <input class="kt-input" id="kt-l-${i}" value="${s.l}" placeholder="Left word">
+      <input class="kt-input" id="kt-r-${i}" value="${s.r}" placeholder="Right word">
+    </div>
+  `).join('');
+}
+
+/* ── SERVICE DISCIPLINES ── */
+function buildDiscList(containerId, discs, domain){
+  const c = document.getElementById(containerId);
+  if(!c) return;
+  c.innerHTML = discs.map((d,i)=>`
+    <div class="svc-disc-item">
+      <span class="kt-num">0${i+1}</span>
+      <input class="kt-input" id="sv-d${domain}-disc-${i}-name" value="${d.name}" placeholder="Discipline name">
+      <input class="kt-input" id="sv-d${domain}-disc-${i}-tags" value="${d.tags}" placeholder="Framework tags">
+    </div>
+  `).join('');
+}
+
+/* ── SAVE ── */
+function saveAll(){
+  /* Hero */
+  DATA.hero.pre  = g('h-pre');  DATA.hero.tag  = g('h-tag');
+  DATA.hero.cta  = g('h-cta');  DATA.hero.link = g('h-link');
+  DATA.hero.video = g('h-video');
+  DATA.hero.videoOpacity = document.getElementById('h-opacity')?document.getElementById('h-opacity').value:'0.55';
+  DATA.hero.bgImg = g('h-bg-img');
+
+  /* Kinetic */
+  DATA.kinetic.stmts.forEach((s,i)=>{
+    s.l = g(`kt-l-${i}`); s.r = g(`kt-r-${i}`);
+  });
+  DATA.kinetic.finalTop = g('kt-final-top');
+  DATA.kinetic.finalBot = g('kt-final-bot');
+
+  /* About */
+  DATA.about.h1=g('ab-h1'); DATA.about.h2=g('ab-h2');
+  DATA.about.s1n=g('ab-s1n'); DATA.about.s1l=g('ab-s1l');
+  DATA.about.s2n=g('ab-s2n'); DATA.about.s2l=g('ab-s2l');
+  DATA.about.p1=g('ab-p1'); DATA.about.p2=g('ab-p2');
+  DATA.about.pull=g('ab-pull');
+  DATA.about.fwEy=g('ab-fw-ey'); DATA.about.fwH=g('ab-fw-h');
+  DATA.about.fwP1=g('ab-fw-p1');
+  DATA.about.fwP2=g('ab-fw-p2');
+  DATA.about.fwP3=g('ab-fw-p3');
+
+  /* Services */
+  DATA.services.d1Name=g('sv-d1-name'); DATA.services.d1Sub=g('sv-d1-sub');
+  DATA.services.d2Name=g('sv-d2-name'); DATA.services.d2Sub=g('sv-d2-sub');
+  DATA.services.converge=g('sv-converge');
+  DATA.services.d1Discs.forEach((d,i)=>{
+    d.name=g(`sv-d1-disc-${i}-name`); d.tags=g(`sv-d1-disc-${i}-tags`);
+  });
+  DATA.services.d2Discs.forEach((d,i)=>{
+    d.name=g(`sv-d2-disc-${i}-name`); d.tags=g(`sv-d2-disc-${i}-tags`);
+  });
+
+  /* Contact */
+  DATA.contact.h=g('ct-h'); DATA.contact.sub=g('ct-sub');
+  DATA.contact.btn=g('ct-btn'); DATA.contact.link=g('ct-link');
+  DATA.contact.email=g('ct-email'); DATA.contact.li=g('ct-li');
+  DATA.contact.loc=g('ct-loc'); DATA.contact.copy=g('ct-copy');
+
+  localStorage.setItem('numics_admin', JSON.stringify(DATA));
+  localStorage.setItem('numics_saved', new Date().toLocaleTimeString());
+  updateLastSaved();
+  toast('All changes saved.');
+}
+
+function updateLastSaved(){
+  const t = localStorage.getItem('numics_saved');
+  document.getElementById('ds-saved').textContent = t||'—';
+}
+
+/* ── IMAGE HANDLING ── */
+function handleImg(input, hiddenId, prevId){
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const data = e.target.result;
+    const hid = document.getElementById(hiddenId);
+    if(hid) hid.value = data;
+    showPrev(prevId, data);
+    /* Store in DATA */
+    if(hiddenId==='ab-img1') DATA.about.img1=data;
+    if(hiddenId==='ab-img2') DATA.about.img2=data;
+    if(hiddenId==='h-bg-img') DATA.hero.bgImg=data;
+    if(hiddenId==='ed-img') currentImg=data;
+    toast('Image loaded.');
+  };
+  reader.readAsDataURL(file);
+}
+
+/* ── TAB SWITCHING ── */
+function switchTab(btn, panelId){
+  document.querySelectorAll('.art-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.art-tab-panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(panelId).classList.add('active');
+}
+
+/* ── BLOG ── */
+let editingIdx = -1;
+let currentImg = '';
+
+function renderPosts(){
+  const list = document.getElementById('post-list');
+  if(!list) return;
+  document.getElementById('ds-posts').textContent = DATA.posts.length;
+  if(DATA.posts.length===0){
+    list.innerHTML='<div style="padding:24px;text-align:center;color:#9CA3AF;font-size:13px">No posts yet. Click "Add New Post" to create one.</div>';
+    return;
+  }
+  list.innerHTML = DATA.posts.map((p,i)=>`
+    <div class="post-item">
+      <div>
+        <div class="post-item-title">${p.title}</div>
+        <div class="post-item-meta">
+          <span>${p.cat}</span>
+          ${p.date} · ${p.time} read
+        </div>
+      </div>
+      <div class="post-actions">
+        <button class="icon-btn" onclick="openEditor(${i})" title="Edit">✎</button>
+        <button class="icon-btn del" onclick="deletePostAt(${i})" title="Delete">✕</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openEditor(idx){
+  editingIdx = idx;
+  currentImg = '';
+  const overlay = document.getElementById('editorOverlay');
+  const delBtn  = document.getElementById('edDelBtn');
+  overlay.classList.add('open');
+  /* Reset tabs to first */
+  document.querySelectorAll('.art-tab').forEach((t,i)=>t.classList.toggle('active',i===0));
+  document.querySelectorAll('.art-tab-panel').forEach((p,i)=>p.classList.toggle('active',i===0));
+
+  if(idx===-1){
+    document.getElementById('editorTitle').textContent='New Post';
+    ['ed-title','ed-date','ed-time','ed-url','ed-excerpt'].forEach(id=>{
+      const el=document.getElementById(id); if(el) el.value='';
+    });
+    setRteContent('');
+    document.getElementById('ed-cat').value='Regulatory Analysis';
+    document.getElementById('ed-img').value='';
+    document.getElementById('ed-img-prev').style.display='none';
+    delBtn.style.display='none';
+  } else {
+    const p = DATA.posts[idx];
+    document.getElementById('editorTitle').textContent='Edit Post';
+    document.getElementById('ed-title').value   = p.title||'';
+    document.getElementById('ed-cat').value     = p.cat||'Regulatory Analysis';
+    document.getElementById('ed-date').value    = p.date||'';
+    document.getElementById('ed-time').value    = p.time||'';
+    document.getElementById('ed-url').value     = p.url||'';
+    document.getElementById('ed-excerpt').value = p.excerpt||'';
+    setRteContent(p.body||'');
+    document.getElementById('ed-img').value     = p.img||'';
+    if(p.img){ showPrev('ed-img-prev', p.img); currentImg=p.img; }
+    else document.getElementById('ed-img-prev').style.display='none';
+    delBtn.style.display='inline-flex';
+  }
+}
+
+function closeEditor(){
+  document.getElementById('editorOverlay').classList.remove('open');
+}
+
+function savePost(){
+  const post = {
+    id:      editingIdx===-1 ? Date.now() : DATA.posts[editingIdx].id,
+    title:   g('ed-title'),
+    cat:     g('ed-cat'),
+    date:    g('ed-date'),
+    time:    g('ed-time'),
+    url:     g('ed-url'),
+    excerpt: g('ed-excerpt'),
+    body:    getRteContent(),
+    img:     currentImg || g('ed-img'),
+  };
+  if(!post.title){ toast('Please enter a title.'); return; }
+  if(editingIdx===-1) DATA.posts.unshift(post);
+  else DATA.posts[editingIdx]=post;
+  localStorage.setItem('numics_admin', JSON.stringify(DATA));
+  closeEditor();
+  renderPosts();
+  toast('Post saved.');
+}
+
+function deletePostAt(idx){
+  if(!confirm('Delete this post?')) return;
+  DATA.posts.splice(idx,1);
+  localStorage.setItem('numics_admin', JSON.stringify(DATA));
+  renderPosts();
+  toast('Post deleted.');
+}
+
+function deletePost(){
+  if(editingIdx===-1) return;
+  deletePostAt(editingIdx);
+  closeEditor();
+}
+
+/* ── EXPORT ── */
+function exportSite(){
+  saveAll();
+  const d = DATA;
+
+  toast('Generating files...');
+
+  setTimeout(()=>{
+
+    /* ── 1. Generate each article HTML file ── */
+    d.posts.forEach(p => {
+      if(!p.title) return;
+      const filename = p.url || `articles/${p.title.toLowerCase().replace(/[^a-z0-9]+/g,'-').slice(0,40)}.html`;
+      const articleHTML = generateArticle(p);
+      setTimeout(()=>download(filename, articleHTML), 300);
+    });
+
+    /* ── 2. Generate index.html with updated blog cards ── */
+    setTimeout(()=>{
+      fetch('index.html')
+        .then(r=>r.text())
+        .then(html=>{
+          html = applyDataToHTML(html, d);
+          download('index.html', html);
+          toast('✓ All files downloaded. Upload the entire folder to Netlify.');
+        })
+        .catch(()=>{
+          /* Offline fallback — download data + articles only */
+          d.posts.forEach(p=>{ if(p.title) download(p.url||'article.html', generateArticle(p)); });
+          toast('Articles downloaded. Re-export from Netlify for full site update.');
+        });
+    }, 600);
+
+  }, 200);
+}
+
+/* ── Generate a complete article HTML file from post data ── */
+function generateArticle(p){
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>${escHtml(p.title)} — NUMICS</title>
+<meta name="description" content="${escHtml(p.excerpt||'')}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:#fff;color:#111;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+:root{--green:#22C55E;--ink:#111;--mid:#6B7280;--light:#9CA3AF;--line:#E5E7EB;--px:clamp(24px,5vw,64px);--max:720px}
+.art-nav{position:sticky;top:0;z-index:100;background:#fff;border-bottom:1px solid var(--line);height:60px;display:flex;align-items:center;padding:0 var(--px);justify-content:space-between}
+.art-nav-logo{font-size:14px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--ink)}
+.art-nav-logo span{color:var(--green)}
+.art-nav-back{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--light);transition:color .2s}
+.art-nav-back:hover{color:var(--ink)}
+.art-hero{padding:clamp(48px,7vh,88px) var(--px) clamp(32px,5vh,56px);border-bottom:1px solid var(--line);max-width:1100px;margin:0 auto}
+.art-cat{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--green);margin-bottom:18px}
+.art-title{font-family:'Inter',sans-serif;font-size:clamp(28px,5vw,64px);font-weight:900;letter-spacing:-.04em;line-height:1.0;color:var(--ink);margin-bottom:20px}
+.art-deck{font-size:clamp(15px,1.4vw,19px);font-weight:400;line-height:1.6;color:var(--mid);max-width:640px;margin-bottom:28px}
+.art-meta{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.art-meta-item{font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--light)}
+.art-meta-sep{color:var(--line)}
+.art-cover{width:100%;aspect-ratio:16/9;background:#F3F4F6;overflow:hidden}
+.art-cover img{width:100%;height:100%;object-fit:cover;display:block}
+.art-body{max-width:var(--max);margin:0 auto;padding:clamp(40px,6vh,80px) var(--px)}
+.art-body h2{font-size:clamp(20px,2.2vw,28px);font-weight:800;letter-spacing:-.025em;line-height:1.2;color:var(--ink);margin:clamp(36px,5vh,52px) 0 14px;padding-top:clamp(36px,5vh,52px);border-top:1px solid var(--line)}
+.art-body h2:first-child{border-top:none;padding-top:0;margin-top:0}
+.art-body h3{font-size:clamp(16px,1.6vw,20px);font-weight:700;letter-spacing:-.015em;color:var(--ink);margin:28px 0 10px}
+.art-body h4{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--light);margin:24px 0 8px}
+.art-body p{font-size:clamp(15px,1.2vw,17px);font-weight:400;line-height:1.82;color:#374151;margin-bottom:20px}
+.art-body blockquote{border-left:3px solid var(--green);padding:4px 0 4px 20px;margin:28px 0}
+.art-body blockquote p{font-size:clamp(16px,1.4vw,20px);font-weight:500;font-style:italic;color:var(--ink);margin:0}
+.art-body ul{margin:0 0 20px;padding:0;list-style:none}
+.art-body ul li{font-size:clamp(15px,1.2vw,17px);line-height:1.75;color:#374151;padding:6px 0 6px 20px;border-bottom:1px solid var(--line);position:relative}
+.art-body ul li:first-child{border-top:1px solid var(--line)}
+.art-body ul li::before{content:'—';position:absolute;left:0;color:var(--green);font-weight:700}
+.art-body ol{margin:0 0 20px;padding:0;list-style:none;counter-reset:ol}
+.art-body ol li{font-size:clamp(15px,1.2vw,17px);line-height:1.75;color:#374151;padding:8px 0 8px 36px;border-bottom:1px solid var(--line);position:relative;counter-increment:ol}
+.art-body ol li:first-child{border-top:1px solid var(--line)}
+.art-body ol li::before{content:counter(ol,decimal-leading-zero);position:absolute;left:0;top:12px;font-size:10px;font-weight:700;letter-spacing:.06em;color:var(--green)}
+.art-body hr{border:none;border-top:1px solid var(--line);margin:clamp(32px,5vh,52px) 0}
+.art-body strong{font-weight:700;color:var(--ink)}
+.art-body em{font-style:italic;color:var(--mid)}
+.art-body mark{background:transparent;color:var(--green);font-weight:600}
+.art-body figure{margin:28px 0}
+.art-body figure img{width:100%;border-radius:4px;display:block}
+.art-body figcaption{font-size:11px;color:var(--light);margin-top:8px;text-align:center}
+.callout{background:#F0FDF4;border:1.5px solid #BBF7D0;border-radius:6px;padding:18px 20px;margin:24px 0}
+.callout p{color:#166534;font-size:14px;line-height:1.7;margin:0}
+.art-footer{border-top:1px solid var(--line);padding:clamp(28px,4vh,48px) var(--px);max-width:var(--max);margin:0 auto}
+.art-footer-back{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink);border:1.5px solid var(--line);padding:10px 18px;border-radius:3px;transition:background .2s,border-color .2s}
+.art-footer-back:hover{background:var(--green);color:#fff;border-color:var(--green)}
+.art-footer-copy{font-size:11px;color:var(--light);margin-top:20px;letter-spacing:.04em}
+</style>
+</head>
+<body>
+<nav class="art-nav">
+  <a href="../index.html" class="art-nav-logo">NUMICS<span>.</span></a>
+  <a href="../index.html#insights" class="art-nav-back">← Back to Insights</a>
+</nav>
+<div class="art-hero">
+  <span class="art-cat">${escHtml(p.cat)}</span>
+  <h1 class="art-title">${escHtml(p.title)}</h1>
+  ${p.excerpt ? `<p class="art-deck">${escHtml(p.excerpt)}</p>` : ''}
+  <div class="art-meta">
+    <div class="art-meta-item">${escHtml(p.date)}</div>
+    ${p.time ? `<span class="art-meta-sep">·</span><div class="art-meta-item">${escHtml(p.time)} read</div>` : ''}
+    <span class="art-meta-sep">·</span>
+    <div class="art-meta-item">Waqar Ahmed</div>
+  </div>
+</div>
+${p.img ? `<div class="art-cover"><img src="${p.img}" alt="${escHtml(p.title)}"></div>` : ''}
+<div class="art-body">
+  ${p.body || '<p>Article content coming soon.</p>'}
+</div>
+<div class="art-footer">
+  <a href="../index.html#insights" class="art-footer-back">← Back to Insights</a>
+  <p class="art-footer-copy">© 2025 NUMICS · Ruhr Region, Germany</p>
+</div>
+</body>
+</html>`;
+}
+
+/* ── Escape HTML for safe injection ── */
+function escHtml(str){
+  return (str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ── Apply saved data to index.html ── */
+function applyDataToHTML(html, d){
+  const dataScript = `<script id="numics-data">window.NUMICS_DATA=${JSON.stringify(d)};<\/script>`;
+  html = html.replace(/<script id="numics-data">[\s\S]*?<\/script>/,'');
+  html = html.replace('</head>', dataScript+'</head>');
+  return html;
+}
+
+/* ── Download a file ── */
+function download(filename, content){
+  const a = document.createElement('a');
+  const mime = filename.endsWith('.json') ? 'application/json' : 'text/html';
+  a.href = 'data:'+mime+';charset=utf-8,'+encodeURIComponent(content);
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+/* ── TOAST ── */
+function toast(msg){
+  const el=document.getElementById('toast');
+  document.getElementById('toastMsg').textContent=msg;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2800);
+}
+
+/* ── RICH TEXT EDITOR FUNCTIONS ── */
+function rteCmd(cmd, val){
+  document.getElementById('ed-rte').focus();
+  document.execCommand(cmd, false, val||null);
+}
+function rteBlock(tag){
+  document.getElementById('ed-rte').focus();
+  document.execCommand('formatBlock', false, tag);
+}
+function rteSize(size){
+  if(!size) return;
+  document.getElementById('ed-rte').focus();
+  document.execCommand('fontSize', false, '7');
+  /* Override font size via span */
+  const sel = window.getSelection();
+  if(sel && sel.rangeCount){
+    const range = sel.getRangeAt(0);
+    const spans = document.getElementById('ed-rte').querySelectorAll('font[size="7"]');
+    spans.forEach(s=>{ s.removeAttribute('size'); s.style.fontSize=size; });
+  }
+}
+function rteGreen(){
+  document.getElementById('ed-rte').focus();
+  document.execCommand('foreColor', false, '#22C55E');
+}
+/* Sync RTE content to hidden textarea on save */
+function getRteContent(){
+  return document.getElementById('ed-rte').innerHTML;
+}
+function setRteContent(html){
+  const rte = document.getElementById('ed-rte');
+  rte.innerHTML = html||'';
+}
+
+/* ── CLOSE EDITOR ON OUTSIDE CLICK ── */
+document.getElementById('editorOverlay').addEventListener('click',function(e){
+  if(e.target===this) closeEditor();
+});
+</script>
+</body>
+</html>

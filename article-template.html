@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<!-- ═══════════════════════════════════════════
+     EDITABLE: Page title and meta description
+     Change the text inside <title> and content=""
+════════════════════════════════════════════ -->
+<title>Article Title — NUMICS</title>
+<meta name="description" content="A short description of this article for search engines. Keep under 160 characters.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Inter',sans-serif;
+  background:#fff;color:#111;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+a{text-decoration:none;color:inherit}
+
+:root{
+  --green:#22C55E;
+  --ink:#111111;
+  --mid:#6B7280;
+  --light:#9CA3AF;
+  --line:#E5E7EB;
+  --px:clamp(24px,5vw,64px);
+  --max:720px; /* article content max width */
+}
+
+/* ══ NAV ══ */
+.art-nav{
+  position:sticky;top:0;z-index:100;
+  background:#fff;border-bottom:1px solid var(--line);
+  height:60px;display:flex;align-items:center;
+  padding:0 var(--px);
+  justify-content:space-between;
+}
+.art-nav-logo{
+  font-size:14px;font-weight:900;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--ink);
+}
+.art-nav-logo span{color:var(--green)}
+.art-nav-back{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:12px;font-weight:600;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--light);
+  transition:color .2s;
+}
+.art-nav-back:hover{color:var(--ink)}
+.art-nav-back svg{transition:transform .2s}
+.art-nav-back:hover svg{transform:translateX(-3px)}
+
+/* ══ HERO ══ */
+.art-hero{
+  padding:clamp(56px,8vh,96px) var(--px) clamp(40px,6vh,64px);
+  border-bottom:1px solid var(--line);
+  max-width:1100px;margin:0 auto;
+}
+
+/* ── EDITABLE FIELDS IN HERO ── */
+
+/* Category tag */
+.art-cat{
+  display:inline-block;
+  font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--green);margin-bottom:20px;
+}
+
+/* Main title — largest text on page */
+.art-title{
+  font-family:'Inter',sans-serif;
+  font-size:clamp(32px,5.5vw,72px);
+  font-weight:900;letter-spacing:-.04em;
+  line-height:1.0;color:var(--ink);
+  margin-bottom:24px;
+}
+
+/* Subtitle / deck — optional one sentence summary */
+.art-deck{
+  font-size:clamp(16px,1.5vw,21px);
+  font-weight:400;line-height:1.6;
+  color:var(--mid);max-width:640px;
+  margin-bottom:32px;
+}
+
+/* Meta row — date, read time, author */
+.art-meta{
+  display:flex;align-items:center;gap:16px;
+  flex-wrap:wrap;
+}
+.art-meta-item{
+  font-size:11px;font-weight:500;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--light);
+  display:flex;align-items:center;gap:6px;
+}
+.art-meta-sep{color:var(--line);font-size:14px}
+
+/* ══ COVER IMAGE ══ */
+.art-cover{
+  width:100%;
+  /* EDITABLE: change aspect-ratio to suit your image
+     16/9 = landscape widescreen
+     3/2  = standard photo
+     4/3  = squarish */
+  aspect-ratio:16/9;
+  background:#F3F4F6;
+  overflow:hidden;
+  /* No border-radius — editorial style */
+}
+.art-cover img{
+  width:100%;height:100%;object-fit:cover;display:block;
+}
+/* Placeholder shown when no image */
+.art-cover-ph{
+  width:100%;height:100%;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:10px;color:var(--light);
+}
+.art-cover-ph svg{opacity:.35}
+.art-cover-ph span{
+  font-size:11px;font-weight:500;
+  letter-spacing:.1em;text-transform:uppercase;
+}
+
+/* ══ BODY CONTENT ══ */
+.art-body{
+  max-width:var(--max);
+  margin:0 auto;
+  padding:clamp(48px,7vh,88px) var(--px);
+}
+
+/*
+  ════════════════════════════════════════════
+  TYPOGRAPHY GUIDE — copy paste reference
+
+  All elements below are pre-styled.
+  Copy the HTML tags into your article body.
+  Replace the placeholder text with your content.
+  ════════════════════════════════════════════
+*/
+
+/* H2 — Section heading (use for major sections) */
+.art-body h2{
+  font-family:'Inter',sans-serif;
+  font-size:clamp(22px,2.5vw,32px);
+  font-weight:800;letter-spacing:-.03em;
+  line-height:1.15;color:var(--ink);
+  margin:clamp(40px,5vh,60px) 0 16px;
+  padding-top:clamp(40px,5vh,60px);
+  border-top:1px solid var(--line);
+}
+.art-body h2:first-child{border-top:none;padding-top:0;margin-top:0}
+
+/* H3 — Sub-section heading */
+.art-body h3{
+  font-family:'Inter',sans-serif;
+  font-size:clamp(17px,1.8vw,22px);
+  font-weight:700;letter-spacing:-.02em;
+  line-height:1.25;color:var(--ink);
+  margin:32px 0 12px;
+}
+
+/* H4 — Minor heading */
+.art-body h4{
+  font-size:13px;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;
+  color:var(--light);margin:28px 0 10px;
+}
+
+/* Paragraph — body text */
+.art-body p{
+  font-size:clamp(15px,1.2vw,18px);
+  font-weight:400;line-height:1.82;
+  color:#374151;margin-bottom:22px;
+}
+
+/* Lead paragraph — first paragraph, slightly larger */
+.art-body p.lead{
+  font-size:clamp(17px,1.5vw,21px);
+  font-weight:400;line-height:1.7;
+  color:var(--mid);margin-bottom:32px;
+}
+
+/* Strong / Bold inline */
+.art-body strong{font-weight:700;color:var(--ink)}
+
+/* Italic / Emphasis inline */
+.art-body em{font-style:italic;color:var(--mid)}
+
+/* Highlighted text — green accent */
+.art-body mark{
+  background:transparent;
+  color:var(--green);font-weight:600;
+}
+
+/* Blockquote — pull quote */
+.art-body blockquote{
+  border-left:3px solid var(--green);
+  padding:4px 0 4px 24px;
+  margin:36px 0;
+}
+.art-body blockquote p{
+  font-size:clamp(17px,1.6vw,22px);
+  font-weight:500;font-style:italic;
+  color:var(--ink);line-height:1.55;
+  margin-bottom:0;
+}
+.art-body blockquote cite{
+  display:block;margin-top:10px;
+  font-size:12px;font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase;
+  color:var(--light);font-style:normal;
+}
+
+/* Bullet list */
+.art-body ul{
+  margin:0 0 22px 0;padding:0;
+  list-style:none;
+}
+.art-body ul li{
+  font-size:clamp(15px,1.2vw,18px);
+  line-height:1.75;color:#374151;
+  padding:6px 0 6px 20px;
+  border-bottom:1px solid var(--line);
+  position:relative;
+}
+.art-body ul li:first-child{border-top:1px solid var(--line)}
+.art-body ul li::before{
+  content:'—';
+  position:absolute;left:0;
+  color:var(--green);font-weight:700;
+}
+
+/* Numbered list */
+.art-body ol{
+  margin:0 0 22px 0;padding:0;
+  list-style:none;counter-reset:ol-counter;
+}
+.art-body ol li{
+  font-size:clamp(15px,1.2vw,18px);
+  line-height:1.75;color:#374151;
+  padding:10px 0 10px 40px;
+  border-bottom:1px solid var(--line);
+  position:relative;
+  counter-increment:ol-counter;
+}
+.art-body ol li:first-child{border-top:1px solid var(--line)}
+.art-body ol li::before{
+  content:counter(ol-counter,decimal-leading-zero);
+  position:absolute;left:0;
+  font-size:11px;font-weight:700;
+  letter-spacing:.08em;color:var(--green);
+  top:14px;
+}
+
+/* Inline code */
+.art-body code{
+  background:#F3F4F6;color:#374151;
+  padding:2px 7px;border-radius:3px;
+  font-size:.88em;font-family:monospace;
+}
+
+/* Horizontal rule */
+.art-body hr{
+  border:none;border-top:1px solid var(--line);
+  margin:clamp(40px,5vh,60px) 0;
+}
+
+/* Key stat / callout box */
+.art-body .callout{
+  background:#F0FDF4;border:1.5px solid #BBF7D0;
+  border-radius:6px;padding:20px 24px;margin:32px 0;
+}
+.art-body .callout p{
+  color:#166534;font-size:14px;line-height:1.7;margin:0;
+}
+.art-body .callout strong{color:#14532D}
+
+/* Image inside article */
+.art-body figure{margin:36px 0}
+.art-body figure img{
+  width:100%;border-radius:4px;display:block;
+}
+.art-body figcaption{
+  font-size:11px;font-weight:500;
+  letter-spacing:.04em;color:var(--light);
+  margin-top:10px;text-align:center;
+}
+
+/* ══ FOOTER ══ */
+.art-footer{
+  border-top:1px solid var(--line);
+  padding:clamp(32px,5vh,56px) var(--px);
+  max-width:var(--max);margin:0 auto;
+}
+.art-footer-back{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:12px;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--ink);
+  border:1.5px solid var(--line);padding:10px 20px;border-radius:3px;
+  transition:background .2s,border-color .2s;
+}
+.art-footer-back:hover{background:var(--green);color:#fff;border-color:var(--green)}
+.art-footer-back svg{transition:transform .2s}
+.art-footer-back:hover svg{transform:translateX(-3px)}
+.art-footer-copy{
+  font-size:11px;color:var(--light);margin-top:24px;
+  letter-spacing:.04em;
+}
+
+@media(max-width:640px){
+  .art-hero{padding:40px var(--px) 32px}
+  .art-body{padding:40px var(--px)}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="art-nav">
+  <a href="index.html" class="art-nav-logo">NUMICS<span>.</span></a>
+  <a href="index.html#insights" class="art-nav-back">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    Back to Insights
+  </a>
+</nav>
+
+<!-- HERO -->
+<div class="art-hero">
+
+  <!-- ═══════════════════════════════════════
+       EDITABLE: Category label
+       Options: Regulatory Analysis / Climate Finance /
+       Strategic Intelligence / Supply Chain / Research
+  ═══════════════════════════════════════ -->
+  <span class="art-cat">Regulatory Analysis</span>
+
+  <!-- ═══════════════════════════════════════
+       EDITABLE: Article title
+       Keep under 80 characters for best display
+  ═══════════════════════════════════════ -->
+  <h1 class="art-title">Your Article Title Goes Here — Make It Sharp and Specific</h1>
+
+  <!-- ═══════════════════════════════════════
+       EDITABLE: Deck / subtitle
+       One sentence. What is the key insight?
+       Delete this block if you do not need it.
+  ═══════════════════════════════════════ -->
+  <p class="art-deck">A one-sentence summary of the article's core argument or finding. This appears below the title and above the meta information.</p>
+
+  <!-- ═══════════════════════════════════════
+       EDITABLE: Date, read time, author
+  ═══════════════════════════════════════ -->
+  <div class="art-meta">
+    <div class="art-meta-item">June 2026</div>
+    <span class="art-meta-sep">·</span>
+    <div class="art-meta-item">9 min read</div>
+    <span class="art-meta-sep">·</span>
+    <div class="art-meta-item">Waqar Ahmed</div>
+  </div>
+
+</div>
+
+<!-- COVER IMAGE
+     EDITABLE: Replace the placeholder with your image
+     <img src="your-image.jpg" alt="Description of image">
+     Delete the art-cover-ph div when you add a real image -->
+<div class="art-cover">
+  <div class="art-cover-ph">
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+      <rect x="3" y="3" width="18" height="18" rx="2"/>
+      <circle cx="8.5" cy="8.5" r="1.5"/>
+      <path d="M21 15l-5-5L5 21"/>
+    </svg>
+    <span>Add cover image — replace this block with &lt;img src="your-image.jpg"&gt;</span>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     ARTICLE BODY — paste your content between the tags
+     below. Use the elements shown as your guide.
+
+     QUICK REFERENCE:
+     <h2>Major section heading</h2>
+     <h3>Sub-section heading</h3>
+     <h4>Small label heading</h4>
+     <p class="lead">Opening paragraph — slightly larger</p>
+     <p>Regular paragraph</p>
+     <strong>Bold text inline</strong>
+     <em>Italic text inline</em>
+     <mark>Green highlighted text</mark>
+     <blockquote><p>Pull quote text</p><cite>Source</cite></blockquote>
+     <ul><li>Bullet item</li></ul>
+     <ol><li>Numbered item</li></ol>
+     <hr> — horizontal divider
+     <div class="callout"><p>Key insight or callout box</p></div>
+     <figure><img src="img.jpg"><figcaption>Caption</figcaption></figure>
+════════════════════════════════════════════════════ -->
+<div class="art-body">
+
+  <!-- OPENING PARAGRAPH — slightly larger, use class="lead" -->
+  <p class="lead">This is the opening paragraph. It should summarise the article's core argument in two or three sentences. Use the <code>class="lead"</code> attribute on the first paragraph only — it renders slightly larger than the body text.</p>
+
+  <!-- SECTION HEADING -->
+  <h2>First Section Heading</h2>
+
+  <!-- REGULAR PARAGRAPHS — paste your text here -->
+  <p>This is a regular body paragraph. Paste your article text here. The font size scales responsively between 15px on mobile and 18px on desktop. Line height is set to 1.82 for comfortable reading. Replace this placeholder text with your actual content from your PDF.</p>
+
+  <p>This is a second paragraph. You can have as many paragraphs as needed. Simply copy the <code>&lt;p&gt;&lt;/p&gt;</code> tags and paste your text inside them. Use <strong>bold text</strong> for emphasis on key terms, and <em>italic text</em> for titles or light emphasis.</p>
+
+  <!-- PULL QUOTE — use for key statements -->
+  <blockquote>
+    <p>"This is a pull quote — use it for the most important sentence in your article. It will appear larger and with a green left border."</p>
+    <cite>Optional source or context</cite>
+  </blockquote>
+
+  <!-- SECOND SECTION -->
+  <h2>Second Section Heading</h2>
+
+  <p>Continue your article here. Each <code>&lt;h2&gt;</code> creates a major section break with a thin ruled line above it.</p>
+
+  <!-- SUB-SECTION -->
+  <h3>Sub-section heading</h3>
+
+  <p>Use <code>&lt;h3&gt;</code> for sub-sections within a major section. These are smaller than H2 and have no ruled line above them.</p>
+
+  <!-- BULLET LIST -->
+  <ul>
+    <li>First bullet point — each item has a green dash before it</li>
+    <li>Second bullet point — separated by thin ruled lines</li>
+    <li>Third bullet point — use for lists of three or more items</li>
+  </ul>
+
+  <!-- NUMBERED LIST -->
+  <ol>
+    <li>First numbered item — numbers are green and zero-padded</li>
+    <li>Second numbered item</li>
+    <li>Third numbered item</li>
+  </ol>
+
+  <!-- CALLOUT BOX -->
+  <div class="callout">
+    <p><strong>Key insight:</strong> Use this green callout box for the most important finding, regulatory requirement, or data point in the article. It draws the eye and breaks up the text visually.</p>
+  </div>
+
+  <!-- DIVIDER -->
+  <hr>
+
+  <!-- THIRD SECTION -->
+  <h2>Third Section Heading</h2>
+
+  <p>Add as many sections as your article requires. Delete the sections you do not need. The article will always look clean regardless of length.</p>
+
+  <!-- INLINE IMAGE -->
+  <figure>
+    <!-- EDITABLE: replace src with your image path -->
+    <!-- <img src="your-inline-image.jpg" alt="Description"> -->
+    <!-- <figcaption>Image caption goes here</figcaption> -->
+  </figure>
+
+  <p>Use the <code>&lt;figure&gt;</code> block above to insert images within the article body. Uncomment the img and figcaption lines and add your image path.</p>
+
+  <!-- CLOSING PARAGRAPH -->
+  <h2>Conclusion</h2>
+
+  <p>End with a clear conclusion. What should the reader take away? What should they do next? Keep it concise — one or two paragraphs maximum.</p>
+
+  <p>For further enquiries or to discuss how this applies to your organisation, <mark>contact NUMICS</mark> directly.</p>
+
+</div><!-- end art-body -->
+
+<!-- FOOTER -->
+<div class="art-footer">
+  <a href="index.html#insights" class="art-footer-back">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    Back to Insights
+  </a>
+  <!-- EDITABLE: copyright -->
+  <p class="art-footer-copy">© 2025 NUMICS · Ruhr Region, Germany · All rights reserved.</p>
+</div>
+
+</body>
+</html>
