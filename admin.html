@@ -1585,10 +1585,48 @@ async function pushFile(token, path, content, message){
   return true;
 }
 
-/* ── Push data.json only — lightweight update ── */
+/* ── Push data.json — handles both create and update ── */
 async function pushDataOnly(token, d){
+  const path = 'numics-data.json';
   const content = JSON.stringify(d, null, 2);
-  await pushFile(token, 'numics-data.json', content, 'Update content data — '+new Date().toLocaleString());
+  const encoded = btoa(unescape(encodeURIComponent(content)));
+  const message = 'Update content — '+new Date().toLocaleString();
+
+  /* Step 1: get current SHA if file exists */
+  let sha = null;
+  try {
+    const check = await fetch(
+      `https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/${path}`,
+      { headers:{ Authorization:`token ${token}`, Accept:'application/vnd.github.v3+json' } }
+    );
+    if(check.ok){
+      const data = await check.json();
+      sha = data.sha || null;
+    }
+  } catch(e){}
+
+  /* Step 2: push with SHA if exists, without if new file */
+  const body = { message, content: encoded, branch: GH_BRANCH };
+  if(sha) body.sha = sha;
+
+  const res = await fetch(
+    `https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/${path}`,
+    {
+      method: 'PUT',
+      headers:{
+        Authorization: `token ${token}`,
+        Accept: 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    }
+  );
+
+  if(!res.ok){
+    const err = await res.json();
+    throw new Error(err.message || `Failed to push ${path}`);
+  }
+  return true;
 }
 
 /* ── Main publish function ── */
