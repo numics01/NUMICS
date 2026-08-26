@@ -1524,24 +1524,20 @@ function saveToken(t){ localStorage.setItem('numics_gh_token', t); }
 async function getFileSHA(token, path){
   try {
     const res = await fetch(
-      `https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/${path}?ref=${GH_BRANCH}&t=${Date.now()}`,
-      { headers:{ Authorization:`token ${token}`, Accept:'application/vnd.github.v3+json', 'Cache-Control':'no-cache' } }
+      `https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/${path}`,
+      { headers:{ Authorization:`token ${token}`, Accept:'application/vnd.github.v3+json' } }
     );
     if(res.ok){ const d=await res.json(); return d.sha||null; }
   } catch(e){}
   return null;
 }
 
-/* ── GitHub API: push one file — always gets fresh SHA ── */
+/* ── GitHub API: push one file ── */
 async function pushFile(token, path, content, message){
   const encoded = btoa(unescape(encodeURIComponent(content)));
-
-  /* Get fresh SHA with cache busting */
   const sha = await getFileSHA(token, path);
-
   const body = { message, content: encoded, branch: GH_BRANCH };
   if(sha) body.sha = sha;
-
   const res = await fetch(
     `https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/${path}`,
     {
@@ -1554,71 +1550,38 @@ async function pushFile(token, path, content, message){
       body: JSON.stringify(body)
     }
   );
-
-  if(!res.ok){
-    const errData = await res.json();
-    /* SHA conflict — get another fresh SHA and retry */
-    if(res.status === 409 || (errData.message && errData.message.includes('does not match'))){
-      await new Promise(r=>setTimeout(r,500));
-      const freshSha = await getFileSHA(token, path);
-      if(freshSha){
-        body.sha = freshSha;
-        const retry = await fetch(
-          `https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/${path}`,
-          {
-            method:'PUT',
-            headers:{
-              Authorization:`token ${token}`,
-              Accept:'application/vnd.github.v3+json',
-              'Content-Type':'application/json'
-            },
-            body: JSON.stringify(body)
-          }
-        );
-        if(retry.ok) return true;
-        const retryErr = await retry.json();
-        throw new Error(retryErr.message||'Push failed after retry');
-      }
-    }
-    throw new Error(errData.message||`Push failed: ${res.status}`);
-  }
+  if(!res.ok){ const e=await res.json(); throw new Error(e.message||'Push failed'); }
   return true;
 }
-
-/* ── Push data.json — handles both create and update ── */
 async function pushDataOnly(token, d){
   const path = 'numics-data.json';
   const content = JSON.stringify(d, null, 2);
   const encoded = btoa(unescape(encodeURIComponent(content)));
   const message = 'Update content — '+new Date().toLocaleString();
 
-  /* Step 1: get current SHA */
+  /* Step 1: get current SHA — no extra headers, just auth */
   let sha = null;
-  const checkUrl = `https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/${path}`;
-  const checkRes = await fetch(checkUrl, {
-    headers:{
-      Authorization: `token ${token}`,
-      Accept: 'application/vnd.github.v3+json'
+  const checkRes = await fetch(
+    `https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/${path}`,
+    {
+      headers:{
+        Authorization: `token ${token}`,
+        Accept: 'application/vnd.github.v3+json'
+      }
     }
-  });
+  );
 
   if(checkRes.ok){
     const checkData = await checkRes.json();
-    sha = checkData.sha;
-    console.log('Got SHA:', sha);
-  } else if(checkRes.status === 404){
-    console.log('File does not exist yet — creating new');
-    sha = null;
-  } else {
+    sha = checkData.sha || null;
+  } else if(checkRes.status !== 404){
     const errData = await checkRes.json();
     throw new Error('SHA fetch failed: ' + errData.message);
   }
 
-  /* Step 2: push */
+  /* Step 2: push with or without SHA */
   const body = { message, content: encoded, branch: GH_BRANCH };
   if(sha) body.sha = sha;
-
-  console.log('Pushing with SHA:', sha);
 
   const res = await fetch(
     `https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/${path}`,
@@ -1635,11 +1598,8 @@ async function pushDataOnly(token, d){
 
   if(!res.ok){
     const err = await res.json();
-    console.error('Push error:', err);
     throw new Error(err.message || `Failed: ${res.status}`);
   }
-
-  console.log('Push successful!');
   return true;
 }
 
