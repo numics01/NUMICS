@@ -168,18 +168,19 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 <nav id="nav">
   <div class="nav-inner">
     <div class="nav-logo-area">
-      <div class="nav-logo-img" title="Replace with your logo">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2">
-          <rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 21V9"/>
-        </svg>
-      </div>
-      <div class="nav-logo">NUMICS<span>.</span></div>
+      <a href="#" style="display:flex;align-items:center;gap:10px;text-decoration:none">
+        <div class="nav-logo-img" title="Replace with your logo">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 21V9"/>
+          </svg>
+        </div>
+        <div class="nav-logo">NUMICS<span>.</span></div>
+      </a>
     </div>
     <div class="nav-right">
       <ul class="nav-links">
         <li><a href="#about">About</a></li>
         <li><a href="#services">Services</a></li>
-        <li><a href="#operate">Where We Work</a></li>
         <li><a href="#insights">Insights</a></li>
       </ul>
       <a href="https://linkedin.com/company/numics" target="_blank" rel="noopener" class="nav-linkedin" aria-label="LinkedIn">
@@ -201,7 +202,6 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   <span class="mob-x" onclick="document.getElementById('mob').classList.remove('open');document.body.style.overflow=''">✕</span>
   <a href="#about"    onclick="document.getElementById('mob').classList.remove('open');document.body.style.overflow=''">About</a>
   <a href="#services" onclick="document.getElementById('mob').classList.remove('open');document.body.style.overflow=''">Services</a>
-  <a href="#operate"  onclick="document.getElementById('mob').classList.remove('open');document.body.style.overflow=''">Where We Work</a>
   <a href="#insights" onclick="document.getElementById('mob').classList.remove('open');document.body.style.overflow=''">Insights</a>
   <a href="#contact"  onclick="document.getElementById('mob').classList.remove('open');document.body.style.overflow=''" style="color:var(--blue)">Consultation</a>
 </div>
