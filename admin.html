@@ -1520,22 +1520,23 @@ const GH_BRANCH = 'main';
 function getToken(){ return localStorage.getItem('numics_gh_token')||''; }
 function saveToken(t){ localStorage.setItem('numics_gh_token', t); }
 
-/* ── GitHub API: get current file SHA ── */
-async function getFileSHA(token, path){
-  try {
-    const res = await fetch(
-      `https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/${path}`,
-      { headers:{ Authorization:`token ${token}`, Accept:'application/vnd.github.v3+json' } }
-    );
-    if(res.ok){ const d=await res.json(); return d.sha||null; }
-  } catch(e){}
-  return null;
+/* ── GitHub API: get file content AND sha in one call ── */
+async function getFileFromGH(token, path){
+  const res = await fetch(
+    `https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/${path}`,
+    { headers:{ Authorization:`token ${token}`, Accept:'application/vnd.github.v3+json' } }
+  );
+  if(!res.ok) return null;
+  const data = await res.json();
+  return {
+    sha: data.sha,
+    content: decodeURIComponent(escape(atob(data.content.replace(/\n/g,''))))
+  };
 }
 
-/* ── GitHub API: push one file ── */
-async function pushFile(token, path, content, message){
+/* ── Push file with known SHA ── */
+async function pushToGH(token, path, content, sha, message){
   const encoded = btoa(unescape(encodeURIComponent(content)));
-  const sha = await getFileSHA(token, path);
   const body = { message, content: encoded, branch: GH_BRANCH };
   if(sha) body.sha = sha;
   const res = await fetch(
@@ -1553,55 +1554,6 @@ async function pushFile(token, path, content, message){
   if(!res.ok){ const e=await res.json(); throw new Error(e.message||'Push failed'); }
   return true;
 }
-async function pushDataOnly(token, d){
-  const path = 'numics-data.json';
-  const content = JSON.stringify(d, null, 2);
-  const encoded = btoa(unescape(encodeURIComponent(content)));
-  const message = 'Update content — '+new Date().toLocaleString();
-
-  /* Step 1: get current SHA — no extra headers, just auth */
-  let sha = null;
-  const checkRes = await fetch(
-    `https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/${path}`,
-    {
-      headers:{
-        Authorization: `token ${token}`,
-        Accept: 'application/vnd.github.v3+json'
-      }
-    }
-  );
-
-  if(checkRes.ok){
-    const checkData = await checkRes.json();
-    sha = checkData.sha || null;
-  } else if(checkRes.status !== 404){
-    const errData = await checkRes.json();
-    throw new Error('SHA fetch failed: ' + errData.message);
-  }
-
-  /* Step 2: push with or without SHA */
-  const body = { message, content: encoded, branch: GH_BRANCH };
-  if(sha) body.sha = sha;
-
-  const res = await fetch(
-    `https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/${path}`,
-    {
-      method: 'PUT',
-      headers:{
-        Authorization: `token ${token}`,
-        Accept: 'application/vnd.github.v3+json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(body)
-    }
-  );
-
-  if(!res.ok){
-    const err = await res.json();
-    throw new Error(err.message || `Failed: ${res.status}`);
-  }
-  return true;
-}
 
 /* ── Main publish function ── */
 async function publishToGitHub(){
@@ -1614,32 +1566,35 @@ async function publishToGitHub(){
   const btn = document.getElementById('publishBtn');
   btn.textContent = 'Publishing...';
   btn.disabled = true;
-  toast('Connecting to GitHub...');
+  toast('Reading index.html from GitHub...');
 
   try {
 
-    /* ── Test connection ── */
-    const testRes = await fetch(
-      `https://api.github.com/repos/${GH_USER}/${GH_REPO}`,
-      { headers:{ Authorization:`token ${token}`, Accept:'application/vnd.github.v3+json' } }
-    );
-    if(testRes.status===401) throw new Error('Token is invalid or expired. Click ⚙ to update it.');
-    if(testRes.status===404) throw new Error(`Repository "${GH_REPO}" not found. Check repo name and token permissions.`);
-    if(!testRes.ok) throw new Error(`GitHub connection failed. Status: ${testRes.status}`);
+    /* Step 1: Read current index.html from GitHub — gets correct SHA */
+    const current = await getFileFromGH(token, 'index.html');
+    if(!current) throw new Error('Could not read index.html from GitHub. Check token has "repo" permission.');
 
-    toast('Connected. Pushing data...');
+    toast('Injecting changes...');
 
-    /* ── Push numics-data.json — lightweight, no SHA race condition ── */
-    await pushDataOnly(token, d);
-    toast('✓ Data pushed. Pushing articles...');
+    /* Step 2: Inject data script into HTML */
+    let html = current.content;
+    const dataScript = `<script id="numics-data">window.NUMICS_DATA=${JSON.stringify(d)};<\/script>`;
+    html = html.replace(/<script id="numics-data">[\s\S]*?<\/script>/g, '');
+    html = html.replace('</head>', dataScript + '</head>');
 
-    /* ── Push articles ── */
+    toast('Pushing to GitHub...');
+
+    /* Step 3: Push updated index.html with correct SHA */
+    await pushToGH(token, 'index.html', html, current.sha, 'Update site — '+new Date().toLocaleString());
+    toast('✓ index.html updated. Pushing articles...');
+
+    /* Step 4: Push each article */
     for(const p of d.posts){
       if(!p.title) continue;
       const path = p.url || `articles/${p.title.toLowerCase().replace(/[^a-z0-9]+/g,'-').slice(0,40)}.html`;
-      const html = generateArticle(p);
-      await pushFile(token, path, html, `Article: ${p.title.slice(0,50)}`);
-      toast(`✓ Article pushed`);
+      const articleHtml = generateArticle(p);
+      const existing = await getFileFromGH(token, path);
+      await pushToGH(token, path, articleHtml, existing ? existing.sha : null, `Article: ${p.title.slice(0,50)}`);
     }
 
     btn.textContent = '✓ Live!';
@@ -1650,16 +1605,15 @@ async function publishToGitHub(){
       btn.disabled = false;
     }, 4000);
 
-    /* Show success with instructions */
-    alert('✓ Published successfully!\n\nnumics-data.json has been updated on GitHub.\n\nYour site at numics.org will update in 60 seconds.\n\nIf you don\'t see changes, do a hard refresh:\nWindows: Ctrl + Shift + R\nMac: Cmd + Shift + R');
+    toast('✓ Published! numics.org updates in ~60 seconds.');
 
   } catch(err){
     console.error('Publish error:', err);
     btn.textContent = 'Publish Live ↑';
     btn.style.background = '';
     btn.disabled = false;
-    alert('Publish failed:\n\n' + err.message);
-    if(err.message.includes('invalid')||err.message.includes('expired')||err.message.includes('401')){
+    alert('Publish failed:\n\n' + err.message + '\n\nMake sure your GitHub token has "repo" permission.');
+    if(err.message.includes('401') || err.message.includes('invalid')){
       localStorage.removeItem('numics_gh_token');
       openGHSettings();
     }
