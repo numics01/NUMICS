@@ -1532,23 +1532,54 @@ async function getFileSHA(token, path){
   return null;
 }
 
-/* ── GitHub API: push one file ── */
+/* ── GitHub API: push one file with retry on SHA mismatch ── */
 async function pushFile(token, path, content, message){
+  const encoded = btoa(unescape(encodeURIComponent(content)));
+
+  /* Always get fresh SHA immediately before pushing */
   const sha = await getFileSHA(token, path);
-  const body = {
-    message,
-    content: btoa(unescape(encodeURIComponent(content))),
-    branch: GH_BRANCH,
-  };
+
+  const body = { message, content: encoded, branch: GH_BRANCH };
   if(sha) body.sha = sha;
+
   const res = await fetch(
     `https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/${path}`,
     {
       method:'PUT',
-      headers:{ Authorization:`token ${token}`, Accept:'application/vnd.github.v3+json', 'Content-Type':'application/json' },
+      headers:{
+        Authorization:`token ${token}`,
+        Accept:'application/vnd.github.v3+json',
+        'Content-Type':'application/json'
+      },
       body: JSON.stringify(body)
     }
   );
+
+  if(res.status === 409){
+    /* SHA conflict — get fresh SHA and retry once */
+    const freshSha = await getFileSHA(token, path);
+    if(freshSha){
+      body.sha = freshSha;
+      const retry = await fetch(
+        `https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/${path}`,
+        {
+          method:'PUT',
+          headers:{
+            Authorization:`token ${token}`,
+            Accept:'application/vnd.github.v3+json',
+            'Content-Type':'application/json'
+          },
+          body: JSON.stringify(body)
+        }
+      );
+      if(!retry.ok){
+        const err = await retry.json();
+        throw new Error(err.message||'Push failed after retry');
+      }
+      return true;
+    }
+  }
+
   if(!res.ok){
     const err = await res.json();
     throw new Error(err.message||'GitHub push failed');
