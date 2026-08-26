@@ -1563,22 +1563,23 @@ async function publishToGitHub(){
 
   try {
 
-    /* Step 1: Read current index.html from GitHub — gets correct SHA */
+    /* Step 1: Get current SHA from GitHub (required for PUT), but use our
+       embedded index.html as the content base — it has the data bridge reader */
     const current = await getFileFromGH(token, 'index.html');
-    if(!current) throw new Error('Could not read index.html from GitHub. Check token has "repo" permission.');
+    const sha = current ? current.sha : null;
 
     toast('Injecting changes...');
 
-    /* Step 2: Inject data script into HTML */
-    let html = current.content;
+    /* Step 2: Inject data script into embedded base HTML */
     const dataScript = '<scr'+'ipt id="numics-data">window.NUMICS_DATA='+JSON.stringify(d)+';</'+'script>';
+    let html = __NUMICS_INDEX_HTML;
     html = html.replace(/<script id="numics-data">[\s\S]*?<\/script>/g, '');
     html = html.replace('</head>', dataScript + '</head>');
 
     toast('Pushing to GitHub...');
 
-    /* Step 3: Push updated index.html with correct SHA */
-    await pushToGH(token, 'index.html', html, current.sha, 'Update site — '+new Date().toLocaleString());
+    /* Step 3: Push updated index.html */
+    await pushToGH(token, 'index.html', html, sha, 'Update site — '+new Date().toLocaleString());
     toast('✓ index.html updated. Pushing articles...');
 
     /* Step 4: Push each article */
