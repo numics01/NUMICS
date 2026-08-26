@@ -1513,18 +1513,18 @@ document.getElementById('editorOverlay').addEventListener('click',function(e){
 ══════════════════════════════════════════ */
 
 const GH_USER = 'numics01';
-const GH_REPO = 'NUMICS Website';
+const GH_REPO = 'NUMICS-Website';
 const GH_BRANCH = 'main';
 
 /* Load saved token */
 function getToken(){ return localStorage.getItem('numics_gh_token')||''; }
 function saveToken(t){ localStorage.setItem('numics_gh_token', t); }
 
-/* ── GitHub API: get current file SHA (needed to update existing files) ── */
+/* ── GitHub API: get current file SHA ── */
 async function getFileSHA(token, path){
   try {
     const res = await fetch(
-      `https://api.github.com/repos/${GH_USER}/${encodeURIComponent(GH_REPO)}/contents/${path}?ref=${GH_BRANCH}`,
+      `https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/${path}?ref=${GH_BRANCH}`,
       { headers:{ Authorization:`token ${token}`, Accept:'application/vnd.github.v3+json' } }
     );
     if(res.ok){ const d=await res.json(); return d.sha||null; }
@@ -1542,7 +1542,7 @@ async function pushFile(token, path, content, message){
   };
   if(sha) body.sha = sha;
   const res = await fetch(
-    `https://api.github.com/repos/${GH_USER}/${encodeURIComponent(GH_REPO)}/contents/${path}`,
+    `https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/${path}`,
     {
       method:'PUT',
       headers:{ Authorization:`token ${token}`, Accept:'application/vnd.github.v3+json', 'Content-Type':'application/json' },
@@ -1619,9 +1619,15 @@ async function publishToGitHub(){
   }
 }
 
-/* ── Settings overlay: enter token ── */
-function openGHSettings(){ document.getElementById('gh-settings-overlay').style.display='flex'; }
-function closeGHSettings(){ document.getElementById('gh-settings-overlay').style.display='none'; }
+function openGHSettings(){
+  const ov = document.getElementById('gh-settings-overlay');
+  ov.style.display = 'flex';
+  const t = getToken();
+  if(t){ const el=document.getElementById('gh-token-input'); if(el) el.value=t; }
+}
+function closeGHSettings(){
+  document.getElementById('gh-settings-overlay').style.display='none';
+}
 function saveGHToken(){
   const t = document.getElementById('gh-token-input').value.trim();
   if(!t){ toast('Please enter your token.'); return; }
@@ -1638,7 +1644,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 </script>
 
 <!-- GITHUB SETTINGS OVERLAY -->
-<div id="gh-settings-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:600;align-items:center;justify-content:center;display:none">
+<div id="gh-settings-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:600;align-items:center;justify-content:center">
   <div style="background:#fff;width:100%;max-width:440px;border-radius:10px;overflow:hidden;margin:24px">
     <div style="padding:20px 24px;border-bottom:1px solid #E5E7EB;display:flex;align-items:center;justify-content:space-between">
       <div style="font-size:14px;font-weight:700">Connect to GitHub</div>
