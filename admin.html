@@ -1560,61 +1560,84 @@ async function pushFile(token, path, content, message){
 async function publishToGitHub(){
   const token = getToken();
   if(!token){
-    document.getElementById('gh-settings-overlay').style.display='flex';
+    openGHSettings();
     return;
   }
 
   saveAll();
   const d = DATA;
 
-  /* Update publish button */
   const btn = document.getElementById('publishBtn');
   btn.textContent = 'Publishing...';
   btn.disabled = true;
-  toast('Connecting to GitHub...');
+
+  toast('Testing GitHub connection...');
 
   try {
+
+    /* ── Test connection first ── */
+    const testRes = await fetch(
+      `https://api.github.com/repos/${GH_USER}/${GH_REPO}`,
+      { headers:{ Authorization:`token ${token}`, Accept:'application/vnd.github.v3+json' } }
+    );
+
+    if(testRes.status === 401){
+      throw new Error('Token is invalid or expired. Click ⚙ to update it.');
+    }
+    if(testRes.status === 404){
+      throw new Error(`Repository "${GH_REPO}" not found. Check the repo name and token permissions.`);
+    }
+    if(!testRes.ok){
+      throw new Error(`GitHub connection failed. Status: ${testRes.status}`);
+    }
+
+    toast('Connected. Pushing index.html...');
 
     /* ── Push index.html ── */
     let indexHTML = '';
     try {
       const r = await fetch('index.html');
       indexHTML = await r.text();
-    } catch(e){ indexHTML = '<!-- fetch failed -->'; }
+    } catch(e){
+      /* If running locally, generate minimal update */
+      indexHTML = document.documentElement.outerHTML;
+    }
 
     const dataScript = `<script id="numics-data">window.NUMICS_DATA=${JSON.stringify(d)};<\/script>`;
     indexHTML = indexHTML.replace(/<script id="numics-data">[\s\S]*?<\/script>/,'');
     indexHTML = indexHTML.replace('</head>', dataScript+'</head>');
-    await pushFile(token, 'index.html', indexHTML, 'Update site content');
-    toast('index.html pushed...');
+
+    await pushFile(token, 'index.html', indexHTML, 'Update site — '+new Date().toLocaleString());
+    toast('✓ index.html pushed. Pushing articles...');
 
     /* ── Push each article ── */
     for(const p of d.posts){
       if(!p.title) continue;
       const path = p.url || `articles/${p.title.toLowerCase().replace(/[^a-z0-9]+/g,'-').slice(0,40)}.html`;
       const html = generateArticle(p);
-      await pushFile(token, path, html, `Update article: ${p.title.slice(0,50)}`);
-      toast(`Article pushed: ${p.title.slice(0,30)}...`);
+      await pushFile(token, path, html, `Article: ${p.title.slice(0,50)}`);
     }
 
-    btn.textContent = '✓ Published';
+    btn.textContent = '✓ Live!';
     btn.style.background = '#22C55E';
     setTimeout(()=>{
       btn.textContent = 'Publish Live ↑';
       btn.style.background = '';
       btn.disabled = false;
-    }, 3000);
+    }, 4000);
 
-    toast('✓ All files published. Site updating in 60 seconds.');
+    toast('✓ Published! numics.org updates in ~60 seconds.');
 
   } catch(err){
+    console.error('Publish error:', err);
     btn.textContent = 'Publish Live ↑';
+    btn.style.background = '';
     btn.disabled = false;
-    toast('Error: '+err.message);
-    /* If auth error, show settings */
-    if(err.message.includes('Bad credentials')||err.message.includes('401')){
+    alert('Publish failed:\n\n' + err.message + '\n\nCheck:\n1. Token has "repo" permission\n2. Token is not expired\n3. Repository name is correct');
+
+    if(err.message.includes('invalid') || err.message.includes('expired') || err.message.includes('401')){
       localStorage.removeItem('numics_gh_token');
-      document.getElementById('gh-settings-overlay').style.display='flex';
+      openGHSettings();
     }
   }
 }
