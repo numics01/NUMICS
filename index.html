@@ -161,7 +161,36 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 }
 
 </style>
-<script id="numics-data">window.NUMICS_DATA={"hero":{"pre":"Sustainability is a","tag":"We are the architects.","cta":"Request a Consultation","link":"","video":"","videoOpacity":"0.55","bgImg":""},"kinetic":{"stmts":[{"l":"Regulation","r":"Revenue"},{"l":"Data","r":"Decisions"},{"l":"Efficiency","r":"Growth"},{"l":"Sustainability","r":"Profit"},{"l":"Risk","r":"Opportunity"},{"l":"Complexity","r":"Action"}],"finalTop":"Where all of it meets","finalBot":"The Bottom Line"},"about":{"h1":"We transform complexity","h2":"into better decisions.","s1n":"7+","s1l":"Years cross-sector experience","s2n":"3","s2l":"Continents of project work","p1":"NUMICS is a founder-led strategic intelligence firm based in the Ruhr Region, Germany. We work at the intersection of EU sustainability regulation, climate finance, data and emerging market project development.","p2":"We don't begin with a predefined answer. We investigate, challenge assumptions, and turn evidence into decisions that move ideas forward.","pull":"We begin with the question.","fwEy":"How it started","fwH":"One founder, one conviction.","fwP1":"Waqar Ahmed has always been driven by one question: how can technical expertise and strategic intelligence solve problems that actually matter?","fwP2":"The sustainability transition is the defining business challenge of this decade. Most firms treat it as a compliance problem. Waqar saw it as a decision problem — and built NUMICS to address it differently.","fwP3":"NUMICS is not built around a service catalogue. It is built around a specific accumulation of expertise — regulatory depth, quantitative rigour, global project experience and AI-augmented intelligence.","img1":"","img2":""},"services":{"d1Name":"Europe","d1Sub":"EU regulatory depth - from Taxonomy to CSDDD - translated into decisions that move organisations forward.","d1Discs":[{"name":"Sustainable Finance & ESG","tags":"EU Taxonomy · CSRD · SFDR · PAIs · PCAF · PPWR · EUBR · VSME"},{"name":"Climate & Sustainability Strategy","tags":"SBTi · TCFD · GHG Protocol · TNFD "},{"name":"Human Rights & Supply Chain","tags":"LkSG · CSDDD · EUDR · OECD · ILO"}],"d2Name":"Global South","d2Sub":"On-the-ground intelligence across Africa, South Asia, and beyond - where European capital meets emerging market reality.","d2Discs":[{"name":"Project Development & Feasibility","tags":"Climate Finance · Feasibility Studies · Investment Readiness"},{"name":"Renewable Energy & Waste","tags":"Biogas · Solar · Circular Economy · Waste Management"},{"name":"Research & Market Intelligence","tags":"Market Research · Socio-economic Analysis · Development Finance"}],"converge":"Both converge into one capability - NUMICS."},"contact":{"h":"Ready to begin with the right question?","sub":"Every engagement starts with a 30-minute conversation.","btn":"Request a Conversation","link":"","email":"hello@numics.de","li":"https://linkedin.com/company/numics","loc":"Ruhr Region, Germany","copy":"© 2025 NUMICS. All rights reserved."},"posts":[{"id":1,"title":"CSRD Year One: What the first wave of mandatory disclosures reveals","cat":"Regulatory Analysis","date":"June 2026","time":"9 min","url":"articles/csrd-year-one.html","img":""},{"id":2,"title":"The investment readiness gap in Global South renewable energy projects","cat":"Climate Finance","date":"May 2026","time":"7 min","url":"articles/global-south-investment.html","img":""},{"id":3,"title":"EU Taxonomy alignment as portfolio strategy, not compliance exercise","cat":"Strategic Intelligence","date":"April 2026","time":"6 min","url":"articles/eu-taxonomy-strategy.html","img":""}]};</script></head>
+<script>
+/* Load live content data from numics-data.json if available */
+fetch('numics-data.json?t='+Date.now())
+  .then(r=>r.json())
+  .then(d=>{
+    if(!d) return;
+    /* Hero */
+    if(d.hero){
+      const pre=document.getElementById('stmtPre'); if(pre&&d.hero.pre) pre.textContent=d.hero.pre;
+      const tag=document.getElementById('stmtTagline'); if(tag&&d.hero.tag) tag.textContent=d.hero.tag;
+      const cta=document.querySelector('.hero-cta'); if(cta&&d.hero.link) cta.href=d.hero.link;
+      if(cta&&d.hero.cta){ const t=cta.childNodes[0]; if(t&&t.nodeType===3) t.textContent=d.hero.cta+' '; }
+    }
+    /* Contact */
+    if(d.contact){
+      const ch=document.querySelector('.ct-h'); if(ch&&d.contact.h) ch.innerHTML=d.contact.h.replace('question?','<span class="ct-green">question?</span>');
+      const cs=document.querySelector('.ct-sub'); if(cs&&d.contact.sub) cs.textContent=d.contact.sub;
+      const cb=document.querySelector('.ct-btn'); if(cb&&d.contact.link) cb.href=d.contact.link;
+      const em=document.querySelector('.ct-detail-item .ct-detail-val'); if(em&&d.contact.email) em.textContent=d.contact.email;
+      const loc=document.querySelectorAll('.ct-detail-val'); if(loc&&loc[2]&&d.contact.loc) loc[2].textContent=d.contact.loc;
+      const copy=document.querySelector('.ct-copy'); if(copy&&d.contact.copy) copy.textContent=d.contact.copy;
+    }
+    /* Kinetic */
+    if(d.kinetic&&d.kinetic.stmts&&window.NUMICS_STMTS){
+      window.NUMICS_STMTS = d.kinetic.stmts;
+    }
+  })
+  .catch(()=>{}); /* Silently fail if file does not exist yet */
+</script>
+</head>
 <body>
 
 <!-- NAV -->
@@ -1327,10 +1356,10 @@ window.addEventListener('DOMContentLoaded', () => {
           <div class="ins-card-overlay"></div>
           <div class="ins-card-content">
             <span class="ins-card-cat">Regulatory Analysis</span>
-            <h3 class="ins-card-title"><a href='/articles/csrd-year-one'>CSRD Year One: What the first wave of mandatory disclosures reveals</a></h3>
+            <h3 class="ins-card-title"><a href="articles/csrd-year-one.html">CSRD Year One: What the first wave of mandatory disclosures reveals</a></h3>
             <div class="ins-card-footer">
               <div class="ins-meta"><span class="ins-date">June 2026</span><span class="ins-dot-sep">·</span><span class="ins-time">9 min</span></div>
-              <a class='ins-card-cta' href='/articles/csrd-year-one'>Read <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+              <a href="articles/csrd-year-one.html" class="ins-card-cta">Read <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
             </div>
           </div>
         </article>
@@ -1343,10 +1372,10 @@ window.addEventListener('DOMContentLoaded', () => {
           <div class="ins-card-overlay"></div>
           <div class="ins-card-content">
             <span class="ins-card-cat">Climate Finance</span>
-            <h3 class="ins-card-title"><a href='/articles/global-south-investment'>The investment readiness gap in Global South renewable energy projects</a></h3>
+            <h3 class="ins-card-title"><a href="articles/global-south-investment.html">The investment readiness gap in Global South renewable energy projects</a></h3>
             <div class="ins-card-footer">
               <div class="ins-meta"><span class="ins-date">May 2026</span><span class="ins-dot-sep">·</span><span class="ins-time">7 min</span></div>
-              <a class='ins-card-cta' href='/articles/global-south-investment'>Read <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+              <a href="articles/global-south-investment.html" class="ins-card-cta">Read <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
             </div>
           </div>
         </article>
@@ -1359,10 +1388,10 @@ window.addEventListener('DOMContentLoaded', () => {
           <div class="ins-card-overlay"></div>
           <div class="ins-card-content">
             <span class="ins-card-cat">Strategic Intelligence</span>
-            <h3 class="ins-card-title"><a href='/articles/eu-taxonomy-strategy'>EU Taxonomy alignment as portfolio strategy, not compliance exercise</a></h3>
+            <h3 class="ins-card-title"><a href="articles/eu-taxonomy-strategy.html">EU Taxonomy alignment as portfolio strategy, not compliance exercise</a></h3>
             <div class="ins-card-footer">
               <div class="ins-meta"><span class="ins-date">April 2026</span><span class="ins-dot-sep">·</span><span class="ins-time">6 min</span></div>
-              <a class='ins-card-cta' href='/articles/eu-taxonomy-strategy'>Read <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+              <a href="articles/eu-taxonomy-strategy.html" class="ins-card-cta">Read <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
             </div>
           </div>
         </article>
@@ -1760,5 +1789,3 @@ a.ct-detail-item:hover .ct-detail-val { color: #22C55E; }
 
 </body>
 </html>
-<script async src="/.netlify/scripts/hud?variant=public" data-nf-variant="public" data-netlify-site-id="b06c030f-a96a-4432-8642-3cf185cf470a" data-app-host="app.netlify.com"></script>
-<script async src="/.netlify/scripts/hud?variant=public" data-nf-variant="public" data-netlify-site-id="b06c030f-a96a-4432-8642-3cf185cf470a" data-app-host="app.netlify.com"></script>
