@@ -1592,22 +1592,33 @@ async function pushDataOnly(token, d){
   const encoded = btoa(unescape(encodeURIComponent(content)));
   const message = 'Update content — '+new Date().toLocaleString();
 
-  /* Step 1: get current SHA if file exists */
+  /* Step 1: get current SHA */
   let sha = null;
-  try {
-    const check = await fetch(
-      `https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/${path}`,
-      { headers:{ Authorization:`token ${token}`, Accept:'application/vnd.github.v3+json' } }
-    );
-    if(check.ok){
-      const data = await check.json();
-      sha = data.sha || null;
+  const checkUrl = `https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/${path}`;
+  const checkRes = await fetch(checkUrl, {
+    headers:{
+      Authorization: `token ${token}`,
+      Accept: 'application/vnd.github.v3+json'
     }
-  } catch(e){}
+  });
 
-  /* Step 2: push with SHA if exists, without if new file */
+  if(checkRes.ok){
+    const checkData = await checkRes.json();
+    sha = checkData.sha;
+    console.log('Got SHA:', sha);
+  } else if(checkRes.status === 404){
+    console.log('File does not exist yet — creating new');
+    sha = null;
+  } else {
+    const errData = await checkRes.json();
+    throw new Error('SHA fetch failed: ' + errData.message);
+  }
+
+  /* Step 2: push */
   const body = { message, content: encoded, branch: GH_BRANCH };
   if(sha) body.sha = sha;
+
+  console.log('Pushing with SHA:', sha);
 
   const res = await fetch(
     `https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/${path}`,
@@ -1624,8 +1635,11 @@ async function pushDataOnly(token, d){
 
   if(!res.ok){
     const err = await res.json();
-    throw new Error(err.message || `Failed to push ${path}`);
+    console.error('Push error:', err);
+    throw new Error(err.message || `Failed: ${res.status}`);
   }
+
+  console.log('Push successful!');
   return true;
 }
 
