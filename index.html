@@ -162,33 +162,90 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 
 </style>
 <script>
-/* Load live content data from numics-data.json if available */
-fetch('numics-data.json?t='+Date.now())
-  .then(r=>r.json())
-  .then(d=>{
-    if(!d) return;
-    /* Hero */
-    if(d.hero){
-      const pre=document.getElementById('stmtPre'); if(pre&&d.hero.pre) pre.textContent=d.hero.pre;
-      const tag=document.getElementById('stmtTagline'); if(tag&&d.hero.tag) tag.textContent=d.hero.tag;
-      const cta=document.querySelector('.hero-cta'); if(cta&&d.hero.link) cta.href=d.hero.link;
-      if(cta&&d.hero.cta){ const t=cta.childNodes[0]; if(t&&t.nodeType===3) t.textContent=d.hero.cta+' '; }
-    }
-    /* Contact */
-    if(d.contact){
-      const ch=document.querySelector('.ct-h'); if(ch&&d.contact.h) ch.innerHTML=d.contact.h.replace('question?','<span class="ct-green">question?</span>');
-      const cs=document.querySelector('.ct-sub'); if(cs&&d.contact.sub) cs.textContent=d.contact.sub;
-      const cb=document.querySelector('.ct-btn'); if(cb&&d.contact.link) cb.href=d.contact.link;
-      const em=document.querySelector('.ct-detail-item .ct-detail-val'); if(em&&d.contact.email) em.textContent=d.contact.email;
-      const loc=document.querySelectorAll('.ct-detail-val'); if(loc&&loc[2]&&d.contact.loc) loc[2].textContent=d.contact.loc;
-      const copy=document.querySelector('.ct-copy'); if(copy&&d.contact.copy) copy.textContent=d.contact.copy;
-    }
-    /* Kinetic */
-    if(d.kinetic&&d.kinetic.stmts&&window.NUMICS_STMTS){
-      window.NUMICS_STMTS = d.kinetic.stmts;
-    }
-  })
-  .catch(()=>{}); /* Silently fail if file does not exist yet */
+/* ══ NUMICS LIVE DATA LOADER ══
+   Reads numics-data.json and updates page content.
+   Runs on every page load — changes appear automatically. */
+(function(){
+  fetch('numics-data.json?v='+Date.now())
+    .then(r=>{ if(!r.ok) throw new Error('No data file'); return r.json(); })
+    .then(function(d){
+
+      /* ── HERO ── */
+      if(d.hero){
+        var pre = document.getElementById('stmtPre');
+        if(pre && d.hero.pre) pre.textContent = d.hero.pre;
+
+        var tag = document.getElementById('stmtTagline');
+        if(tag && d.hero.tag) tag.textContent = d.hero.tag;
+
+        var cta = document.querySelector('.hero-cta');
+        if(cta){
+          if(d.hero.link) cta.href = d.hero.link;
+          if(d.hero.cta){
+            var svg = cta.querySelector('svg');
+            cta.textContent = d.hero.cta + ' ';
+            if(svg) cta.appendChild(svg);
+          }
+        }
+      }
+
+      /* ── KINETIC STATEMENTS ── */
+      if(d.kinetic && d.kinetic.stmts && Array.isArray(d.kinetic.stmts)){
+        window.__KT_STMTS__ = d.kinetic.stmts;
+      }
+
+      /* ── CONTACT ── */
+      if(d.contact){
+        var ch = document.querySelector('.ct-h');
+        if(ch && d.contact.h){
+          ch.innerHTML = d.contact.h.replace(/question\??/i, function(m){
+            return '<span class="ct-green">'+m+'</span>';
+          });
+        }
+        var cs = document.querySelector('.ct-sub');
+        if(cs && d.contact.sub) cs.textContent = d.contact.sub;
+
+        var cb = document.querySelector('.ct-btn');
+        if(cb){
+          if(d.contact.link) cb.href = d.contact.link;
+          if(d.contact.btn){
+            var svg2 = cb.querySelector('svg');
+            cb.textContent = d.contact.btn + ' ';
+            if(svg2) cb.appendChild(svg2);
+          }
+        }
+
+        /* Contact detail items */
+        var items = document.querySelectorAll('.ct-detail-item');
+        items.forEach(function(item){
+          var label = item.querySelector('.ct-detail-label');
+          var val   = item.querySelector('.ct-detail-val');
+          if(!label || !val) return;
+          var l = label.textContent.trim().toLowerCase();
+          if(l==='email' && d.contact.email){
+            val.textContent = d.contact.email;
+            if(item.tagName==='A') item.href = 'mailto:'+d.contact.email;
+          }
+          if(l==='linkedin' && d.contact.li) item.href = d.contact.li;
+          if(l==='location' && d.contact.loc) val.textContent = d.contact.loc;
+        });
+
+        var copy = document.querySelector('.ct-copy');
+        if(copy && d.contact.copy) copy.textContent = d.contact.copy;
+
+        var loc = document.querySelector('.ct-loc');
+        if(loc && d.contact.loc) loc.textContent = d.contact.loc;
+      }
+
+      /* ── ABOUT STATS ── */
+      if(d.about){
+        var s1n = document.querySelector('[data-target]');
+        if(s1n && d.about.s1n) s1n.setAttribute('data-target', parseInt(d.about.s1n)||7);
+      }
+
+    })
+    .catch(function(){ /* No data file yet — use built-in defaults */ });
+})();
 </script>
 </head>
 <body>

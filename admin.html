@@ -1633,13 +1633,13 @@ async function publishToGitHub(){
     await pushDataOnly(token, d);
     toast('✓ Data pushed. Pushing articles...');
 
-    /* ── Push each article ── */
+    /* ── Push articles ── */
     for(const p of d.posts){
       if(!p.title) continue;
       const path = p.url || `articles/${p.title.toLowerCase().replace(/[^a-z0-9]+/g,'-').slice(0,40)}.html`;
       const html = generateArticle(p);
       await pushFile(token, path, html, `Article: ${p.title.slice(0,50)}`);
-      toast(`✓ Article pushed: ${p.title.slice(0,25)}...`);
+      toast(`✓ Article pushed`);
     }
 
     btn.textContent = '✓ Live!';
@@ -1649,7 +1649,9 @@ async function publishToGitHub(){
       btn.style.background = '';
       btn.disabled = false;
     }, 4000);
-    toast('✓ Published! Site updates in ~60 seconds.');
+
+    /* Show success with instructions */
+    alert('✓ Published successfully!\n\nnumics-data.json has been updated on GitHub.\n\nYour site at numics.org will update in 60 seconds.\n\nIf you don\'t see changes, do a hard refresh:\nWindows: Ctrl + Shift + R\nMac: Cmd + Shift + R');
 
   } catch(err){
     console.error('Publish error:', err);
