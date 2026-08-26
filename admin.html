@@ -1778,11 +1778,17 @@ async function publishToGitHub(){
 
     /* Step 2: Apply all admin data directly into the clean base HTML */
     const html = applyDataToHTML(__NUMICS_INDEX_HTML, d);
+    console.log('[NUMICS] HTML built, length:', html.length, 'sha:', sha);
+
+    /* Quick sanity check — did any replacements land? */
+    const preCheck = html.includes(d.hero.pre || 'Sustainability is a');
+    console.log('[NUMICS] Hero pre in output:', preCheck);
 
     toast('Pushing to GitHub...');
 
     /* Step 3: Push — Netlify detects the change and redeploys automatically */
-    await pushToGH(token, 'index.html', html, sha, 'Update site — '+new Date().toLocaleString());
+    const pushResult = await pushToGH(token, 'index.html', html, sha, 'Update site — '+new Date().toLocaleString());
+    console.log('[NUMICS] Push result:', pushResult);
     toast('✓ index.html updated. Pushing articles...');
 
     /* Step 4: Push each article */
@@ -1809,7 +1815,8 @@ async function publishToGitHub(){
     btn.textContent = 'Publish Live ↑';
     btn.style.background = '';
     btn.disabled = false;
-    alert('Publish failed:\n\n' + err.message + '\n\nMake sure your GitHub token has "repo" permission.');
+    console.error('[NUMICS] Full error:', err);
+    alert('Publish failed:\n\n' + err.message + '\n\nOpen browser Console (F12) for details.\nMake sure your GitHub token has "repo" permission and has NOT expired.');
     if(err.message.includes('401') || err.message.includes('invalid')){
       localStorage.removeItem('numics_gh_token');
       openGHSettings();
