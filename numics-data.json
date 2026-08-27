@@ -104,12 +104,14 @@
   "posts": [
     {
       "id": 1,
-      "title": "CSRD Year One: What the first wave of mandatory disclosures reveals",
+      "title": "CSRD : What the first wave of mandatory disclosures reveals",
       "cat": "Regulatory Analysis",
       "date": "June 2026",
       "time": "9 min",
       "url": "articles/csrd-year-one.html",
-      "img": ""
+      "img": "",
+      "excerpt": "",
+      "body": "CSRD Reporting"
     },
     {
       "id": 2,
