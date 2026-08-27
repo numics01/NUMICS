@@ -132,6 +132,17 @@
       "time": "6 min",
       "url": "articles/eu-taxonomy-strategy.html",
       "img": ""
+    },
+    {
+      "id": 1787843997919,
+      "title": "PPWR",
+      "cat": "Regulatory Analysis",
+      "date": "Aug 26, 2026",
+      "time": "5 min",
+      "url": "",
+      "excerpt": "How to implement PPWR",
+      "img": "",
+      "body": "<font size=\"5\"><b>PPWR Implementation Guide</b></font>"
     }
   ]
 }
