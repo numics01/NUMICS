@@ -1739,7 +1739,12 @@ function renderPostList() {
     c.innerHTML = "<div class=\"empty-state\"><div class=\"empty-state-icon\">✦</div><div class=\"empty-state-text\">No articles yet</div><div class=\"empty-state-sub\">Click \"+ New Article\" above to write your first insight</div></div>";
     return;
   }
-  var rows = DATA.posts.map(function(p, i) {
+  var sorted = DATA.posts.slice().sort(function(a, b) {
+    var ai = isNaN(Number(String(a.id).replace("post_",""))) ? 0 : Number(String(a.id).replace("post_",""));
+    var bi = isNaN(Number(String(b.id).replace("post_",""))) ? 0 : Number(String(b.id).replace("post_",""));
+    return bi - ai;
+  });
+  var rows = sorted.map(function(p) {
     return "<tr><td class=\"post-title-cell\">" + esc(p.title || "Untitled") + "</td>" +
       "<td><span class=\"post-cat-badge\">" + esc(p.cat || "Article") + "</span></td>" +
       "<td class=\"post-meta\">" + esc(p.date || "—") + "</td>" +
@@ -1757,7 +1762,11 @@ function renderDashPosts() {
     c.innerHTML = "<div class=\"empty-state\"><div class=\"empty-state-icon\">✦</div><div class=\"empty-state-text\">No posts yet</div><div class=\"empty-state-sub\">Go to Blog / Insights to add your first article</div></div>";
     return;
   }
-  var recent = DATA.posts.slice(-5).reverse();
+  var recent = DATA.posts.slice().sort(function(a,b){
+    var ai=isNaN(Number(String(a.id).replace("post_","")))? 0:Number(String(a.id).replace("post_",""));
+    var bi=isNaN(Number(String(b.id).replace("post_","")))? 0:Number(String(b.id).replace("post_",""));
+    return bi-ai;
+  }).slice(0,5);
   var rows = recent.map(function(p) {
     return "<div style=\"display:flex;align-items:center;justify-content:space-between;padding:10px 18px;border-bottom:1px solid var(--line);gap:12px\">" +
       "<div><div style=\"font-size:12px;font-weight:600\">" + esc(p.title || "Untitled") + "</div>" +
@@ -1878,7 +1887,8 @@ function deletePost() {
   closeEditor();
   renderPostList();
   renderDashPosts();
-  toast("Article deleted.", "yellow");
+  toast("Article deleted. Publishing to GitHub...", "yellow");
+  publishToGitHub();
 }
 
 function switchEdTab(el, panelId) {
