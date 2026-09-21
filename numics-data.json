@@ -4,9 +4,11 @@
     "tag": "We are the architects.",
     "cta": "Request a Consultation",
     "link": "",
+    "navcta": "Request Consultation",
     "video": "hero-video.mp4",
     "videoOpacity": "0.55",
-    "bgImg": ""
+    "bgImg": "",
+    "logo": ""
   },
   "kinetic": {
     "stmts": [
@@ -92,6 +94,7 @@
     "converge": "Both converge into one capability - NUMICS."
   },
   "contact": {
+    "eyebrow": "Contact",
     "h": "Ready to begin with the right question?",
     "sub": "Every engagement starts with a 30-minute conversation.",
     "btn": "Request a Conversation",
@@ -139,10 +142,13 @@
       "cat": "Regulatory Analysis",
       "date": "Aug 26, 2026",
       "time": "5 min",
-      "url": "",
+      "url": "articles/PPWR.html",
       "excerpt": "How to implement PPWR",
       "img": "",
-      "body": "<font size=\"5\"><b>PPWR Implementation Guide</b></font>"
+      "body": "<font size=\"5\"><b>PPWR Implementation Guide<br><br></b></font><font size=\"2\">The PPWR is live from Aug 12, 2026.</font>",
+      "seo": "",
+      "tags": "",
+      "imgAlt": ""
     }
   ]
 }
