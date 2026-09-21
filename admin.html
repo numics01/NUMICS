@@ -1070,6 +1070,7 @@ button,input,textarea,select{font-family:inherit;font-size:13px}
     </div><!-- /modal-body -->
     <div class="modal-foot">
       <button class="btn btn-danger btn-sm" id="edDelBtn" onclick="deletePost()" style="display:none;margin-right:auto">Delete Article</button>
+      <button class="btn btn-ghost btn-sm" id="edCreatePageBtn" onclick="saveAndCreatePage()" style="display:none" title="Saves article data and creates the HTML page file in your articles/ folder on GitHub">Create Article Page</button>
       <button class="btn btn-secondary btn-sm" onclick="closeEditor()">Cancel</button>
       <button class="btn btn-primary btn-sm" onclick="savePost()">Save Article</button>
     </div>
@@ -1790,6 +1791,7 @@ function openEditor(idOrNull) {
     currentPost = post;
     document.getElementById("editorTitle").textContent = "New Article";
     document.getElementById("edDelBtn").style.display = "none";
+    document.getElementById("edCreatePageBtn").style.display = "none";
   } else {
     var found = null;
     for (var i = 0; i < DATA.posts.length; i++) {
@@ -1800,6 +1802,7 @@ function openEditor(idOrNull) {
     currentPost = post;
     document.getElementById("editorTitle").textContent = "Edit: " + (post.title || "Untitled");
     document.getElementById("edDelBtn").style.display = "block";
+    document.getElementById("edCreatePageBtn").style.display = "inline-flex";
   }
   sv("ed-title", post.title);
   sv("ed-cat", post.cat);
@@ -2022,6 +2025,159 @@ function toast(msg, type) {
   el.classList.add("show");
   clearTimeout(el._t);
   el._t = setTimeout(function() { el.classList.remove("show"); }, 3200);
+}
+
+/* ══════════════════════════════════════════
+   CREATE ARTICLE PAGE
+══════════════════════════════════════════ */
+async function saveAndCreatePage() {
+  var post = currentPost;
+  if (!post) return;
+  if (!gv("ed-title").trim()) { toast("Please enter an article title first.", "yellow"); return; }
+
+  /* Save current field values into post */
+  post.title = gv("ed-title");
+  post.cat = gv("ed-cat");
+  post.date = gv("ed-date");
+  post.time = gv("ed-time");
+  post.excerpt = gv("ed-excerpt");
+  post.seo = gv("ed-seo");
+  post.tags = gv("ed-tags");
+  post.imgAlt = gv("ed-img-alt");
+  post.img = gv("ed-img");
+  var rte = document.getElementById("rte");
+  post.body = rte ? rte.innerHTML : "";
+
+  /* Generate slug from title */
+  var slug = post.title.toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .substring(0, 80);
+  var filename = "articles/" + slug + ".html";
+
+  /* Auto-set URL field */
+  sv("ed-url", "https://numics.org/" + filename);
+  post.url = "https://numics.org/" + filename;
+
+  var tok = getToken();
+  if (!tok) { toast("No GitHub token set. Go to Settings first.", "red"); return; }
+
+  /* Build article HTML */
+  var coverHtml = post.img
+    ? "<div class=\"art-cover\" style=\"background-image:url('" + post.img + "')\"></div>"
+    : "";
+  var bodyHtml = post.body || "<p>Article content coming soon.</p>";
+  var metaDesc = (post.excerpt || post.title).replace(/"/g, "&quot;");
+  var pageHtml = "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n" +
+    "<meta charset=\"UTF-8\">\n" +
+    "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1.0\">\n" +
+    "<title>" + esc(post.title) + " | NUMICS</title>\n" +
+    "<meta name=\"description\" content=\"" + metaDesc + "\">\n" +
+    "<link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap\" rel=\"stylesheet\">\n" +
+    "<style>\n" +
+    "*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}\n" +
+    "body{font-family:'Inter',sans-serif;background:#fff;color:#111;-webkit-font-smoothing:antialiased;line-height:1.7}\n" +
+    "a{color:#22C55E;text-decoration:none}\n" +
+    "a:hover{text-decoration:underline}\n" +
+    ".art-nav{display:flex;align-items:center;justify-content:space-between;padding:20px 40px;border-bottom:1px solid #E5E7EB;position:sticky;top:0;background:#fff;z-index:100}\n" +
+    ".art-nav-logo{font-size:15px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:#111}\n" +
+    ".art-nav-logo span{color:#22C55E}\n" +
+    ".art-nav-back{font-size:12px;font-weight:600;color:#6B7280;letter-spacing:.04em}\n" +
+    ".art-nav-back:hover{color:#111;text-decoration:none}\n" +
+    ".art-wrap{max-width:760px;margin:0 auto;padding:60px 40px 100px}\n" +
+    ".art-cover{width:100%;height:380px;background-size:cover;background-position:center;border-radius:8px;margin-bottom:48px}\n" +
+    ".art-cat{font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#22C55E;margin-bottom:16px}\n" +
+    ".art-title{font-size:36px;font-weight:900;letter-spacing:-.02em;line-height:1.2;margin-bottom:20px}\n" +
+    ".art-meta{display:flex;gap:16px;font-size:12px;color:#9CA3AF;font-weight:500;margin-bottom:48px;padding-bottom:32px;border-bottom:1px solid #E5E7EB}\n" +
+    ".art-body{font-size:16px;line-height:1.8;color:#374151}\n" +
+    ".art-body h1{font-size:28px;font-weight:800;margin:48px 0 16px;color:#111}\n" +
+    ".art-body h2{font-size:22px;font-weight:700;margin:40px 0 14px;color:#111}\n" +
+    ".art-body h3{font-size:17px;font-weight:700;margin:32px 0 10px;color:#111}\n" +
+    ".art-body p{margin-bottom:20px}\n" +
+    ".art-body ul,ol{margin:0 0 20px 24px}\n" +
+    ".art-body li{margin-bottom:8px}\n" +
+    ".art-body blockquote{border-left:3px solid #22C55E;padding:12px 20px;margin:28px 0;background:#F0FDF4;font-style:italic;color:#374151}\n" +
+    ".art-body img{max-width:100%;border-radius:6px;margin:24px 0}\n" +
+    ".art-body strong{font-weight:700;color:#111}\n" +
+    ".art-foot{margin-top:64px;padding-top:32px;border-top:1px solid #E5E7EB;display:flex;justify-content:space-between;align-items:center}\n" +
+    ".art-foot-back{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#111;border:1.5px solid #E5E7EB;padding:10px 18px;border-radius:4px}\n" +
+    ".art-foot-back:hover{background:#F4F5F7;text-decoration:none}\n" +
+    "@media(max-width:640px){.art-wrap{padding:40px 20px 80px}.art-title{font-size:26px}.art-nav{padding:16px 20px}.art-cover{height:220px}}\n" +
+    "</style>\n</head>\n<body>\n" +
+    "<nav class=\"art-nav\">\n" +
+    "  <a href=\"https://numics.org\" class=\"art-nav-logo\">NUM<span>ICS</span></a>\n" +
+    "  <a href=\"https://numics.org/#insights\" class=\"art-nav-back\">← Back to Insights</a>\n" +
+    "</nav>\n" +
+    "<div class=\"art-wrap\">\n" +
+    coverHtml + "\n" +
+    "  <div class=\"art-cat\">" + esc(post.cat || "Insights") + "</div>\n" +
+    "  <h1 class=\"art-title\">" + esc(post.title) + "</h1>\n" +
+    "  <div class=\"art-meta\">\n" +
+    (post.date ? "    <span>" + esc(post.date) + "</span>\n" : "") +
+    (post.time ? "    <span>" + esc(post.time) + "</span>\n" : "") +
+    "  </div>\n" +
+    "  <div class=\"art-body\">" + bodyHtml + "</div>\n" +
+    "  <div class=\"art-foot\">\n" +
+    "    <a href=\"https://numics.org/#insights\" class=\"art-foot-back\">← All Insights</a>\n" +
+    "  </div>\n" +
+    "</div>\n</body>\n</html>";
+
+  /* Check if file exists on GitHub */
+  var btn = document.getElementById("edCreatePageBtn");
+  btn.disabled = true;
+  btn.textContent = "Creating...";
+
+  try {
+    var sha = null;
+    var checkRes = await fetch("https://api.github.com/repos/" + CFG.ghUser + "/" + CFG.ghRepo + "/contents/" + filename, {
+      headers: {"Authorization": "token " + tok, "Accept": "application/vnd.github.v3+json"}
+    });
+    if (checkRes.ok) {
+      var checkData = await checkRes.json();
+      sha = checkData.sha;
+    }
+
+    /* Push file */
+    var encoded = btoa(unescape(encodeURIComponent(pageHtml)));
+    var body = {
+      message: "Add article: " + post.title,
+      content: encoded,
+      branch: CFG.ghBranch
+    };
+    if (sha) body.sha = sha;
+
+    var pushRes = await fetch("https://api.github.com/repos/" + CFG.ghUser + "/" + CFG.ghRepo + "/contents/" + filename, {
+      method: "PUT",
+      headers: {"Authorization": "token " + tok, "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json"},
+      body: JSON.stringify(body)
+    });
+
+    if (!pushRes.ok) {
+      var err = await pushRes.json();
+      throw new Error(err.message || pushRes.status);
+    }
+
+    /* Also save post data */
+    var exists = false;
+    for (var i = 0; i < DATA.posts.length; i++) {
+      if (String(DATA.posts[i].id) === String(post.id)) { DATA.posts[i] = post; exists = true; break; }
+    }
+    if (!exists) DATA.posts.push(post);
+    updatePostCount();
+    renderPostList();
+    renderDashPosts();
+
+    btn.textContent = "Page Created!";
+    toast("Article page created: " + filename + " — URL field updated. Click Publish Live to go live.", "green");
+    setTimeout(function() { btn.textContent = "Create Article Page"; btn.disabled = false; }, 3000);
+
+  } catch(e) {
+    btn.textContent = "Create Article Page";
+    btn.disabled = false;
+    toast("Failed: " + e.message, "red");
+  }
 }
 
 /* ══════════════════════════════════════════
