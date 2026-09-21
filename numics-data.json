@@ -106,28 +106,6 @@
   },
   "posts": [
     {
-      "id": 1,
-      "title": "CSRD : What the first wave of mandatory disclosures reveals",
-      "cat": "Regulatory Analysis",
-      "date": "June 2026",
-      "time": "5 min",
-      "url": "articles/csrd-year-one.html",
-      "img": "",
-      "excerpt": "",
-      "body": "CSRD Reporting is mandatory."
-    },
-    {
-      "id": 2,
-      "title": "The investment readiness gap in Global South renewable energy projects",
-      "cat": "Climate Finance",
-      "date": "May 2026",
-      "time": "3 min",
-      "url": "articles/global-south-investment.html",
-      "img": "",
-      "excerpt": "",
-      "body": ""
-    },
-    {
       "id": 3,
       "title": "EU Taxonomy alignment as portfolio strategy, not compliance exercise",
       "cat": "Strategic Intelligence",
