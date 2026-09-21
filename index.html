@@ -500,7 +500,7 @@ function applyData(D){
   if(sv.d2Discs){ const c=document.getElementById('svD2Discs'); if(c){ c.innerHTML=sv.d2Discs.map((d,i)=>`<div class="sv-disc"><span class="sv-disc-n">0${i+1}</span><div class="sv-disc-wrap"><span class="sv-disc-name">${d.name||''}</span><span class="sv-disc-tags">${d.tags||''}</span></div></div>`).join(''); } }
 
   /* INSIGHTS */
-  const posts = D.posts||[];
+  const posts = (D.posts||[]).slice().sort(function(a,b){ return (b.id||0)-(a.id||0); });
   const track = document.getElementById('insTrack');
   if(track && posts.length){
     track.innerHTML = posts.map(p=>`
@@ -606,4 +606,3 @@ window.addEventListener('DOMContentLoaded',()=>{
 </script>
 </body>
 </html>
-<!-- ts:1787844154255 -->

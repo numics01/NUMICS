@@ -3,1290 +3,2057 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>NUMICS Admin</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<title>NUMICS CMS</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Inter',sans-serif;background:#F8F9FA;color:#111;-webkit-font-smoothing:antialiased}
+html,body{height:100%}
+body{font-family:'Inter',sans-serif;background:#F4F5F7;color:#111;-webkit-font-smoothing:antialiased;font-size:13px}
 a{text-decoration:none;color:inherit}
-button,input,textarea,select{font-family:inherit}
-
-/* ── LOGIN ── */
-#login{
-  position:fixed;inset:0;background:#fff;
-  display:flex;align-items:center;justify-content:center;
-  z-index:1000;
-}
-.login-box{
-  width:100%;max-width:380px;padding:0 24px;
-  display:flex;flex-direction:column;gap:20px;
-}
-.login-logo{
-  font-size:22px;font-weight:900;letter-spacing:-.03em;color:#111;
-  margin-bottom:8px;
-}
-.login-logo span{color:#22C55E}
-.login-title{font-size:14px;color:#6B7280;font-weight:400}
-.login-field{display:flex;flex-direction:column;gap:6px}
-.login-field label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#9CA3AF}
-.login-field input{
-  border:1.5px solid #E5E7EB;padding:12px 14px;font-size:14px;
-  border-radius:4px;outline:none;transition:border-color .2s;
-}
-.login-field input:focus{border-color:#22C55E}
-.login-btn{
-  background:#111;color:#fff;border:none;padding:13px;
-  font-size:13px;font-weight:700;letter-spacing:.06em;
-  text-transform:uppercase;cursor:pointer;border-radius:4px;
-  transition:background .2s;
-}
-.login-btn:hover{background:#22C55E}
-.login-err{font-size:12px;color:#EF4444;display:none}
-
-/* ── LAYOUT ── */
-#app{display:none;height:100vh;overflow:hidden}
-.layout{display:grid;grid-template-columns:240px 1fr;height:100vh}
-
-/* ── SIDEBAR ── */
-.sidebar{
-  background:#0A0A0F;color:#fff;
-  display:flex;flex-direction:column;
-  overflow-y:auto;
-}
-.sidebar-logo{
-  padding:24px 20px 20px;
-  font-size:16px;font-weight:900;letter-spacing:-.02em;
-  border-bottom:1px solid rgba(255,255,255,.07);
-}
-.sidebar-logo span{color:#22C55E}
-.sidebar-nav{flex:1;padding:12px 0}
-.nav-item{
-  display:flex;align-items:center;gap:10px;
-  padding:10px 20px;font-size:13px;font-weight:500;
-  color:rgba(255,255,255,.5);cursor:pointer;
-  transition:background .15s,color .15s;
-  border-left:2px solid transparent;
-}
-.nav-item:hover{background:rgba(255,255,255,.04);color:rgba(255,255,255,.8)}
-.nav-item.active{
-  background:rgba(34,197,94,.08);color:#22C55E;
-  border-left-color:#22C55E;
-}
-.nav-item .nav-icon{font-size:15px;width:20px;text-align:center}
-.nav-section{
-  padding:16px 20px 6px;
-  font-size:9px;font-weight:700;letter-spacing:.18em;
-  text-transform:uppercase;color:rgba(255,255,255,.2);
-}
-.sidebar-foot{
-  padding:16px 20px;border-top:1px solid rgba(255,255,255,.07);
-  display:flex;flex-direction:column;gap:8px;
-}
-.logout-btn{
-  background:rgba(255,255,255,.06);color:rgba(255,255,255,.5);
-  border:none;padding:9px 14px;font-size:12px;font-weight:600;
-  cursor:pointer;border-radius:3px;text-align:left;
-  transition:background .2s;
-}
-.logout-btn:hover{background:rgba(239,68,68,.15);color:#EF4444}
-
-/* ── MAIN ── */
-.main{display:flex;flex-direction:column;overflow:hidden}
-.topbar{
-  background:#fff;border-bottom:1px solid #E5E7EB;
-  padding:0 32px;height:60px;
-  display:flex;align-items:center;justify-content:space-between;
-  flex-shrink:0;
-}
-.topbar-title{font-size:15px;font-weight:700;letter-spacing:-.01em}
-.topbar-actions{display:flex;gap:10px}
-.btn{
-  padding:9px 18px;font-size:12px;font-weight:700;
-  letter-spacing:.05em;text-transform:uppercase;
-  cursor:pointer;border-radius:3px;border:none;
-  transition:background .2s,color .2s;
-}
-.btn-primary{background:#22C55E;color:#fff}
-.btn-primary:hover{background:#16A34A}
-.btn-secondary{background:#F3F4F6;color:#111;border:1.5px solid #E5E7EB}
-.btn-secondary:hover{background:#E5E7EB}
-.btn-danger{background:#FEF2F2;color:#EF4444;border:1.5px solid #FECACA}
-.btn-danger:hover{background:#EF4444;color:#fff}
-.content{flex:1;overflow-y:auto;padding:32px}
-
-/* ── PANELS ── */
-.panel{display:none}
-.panel.active{display:block}
-
-/* ── CARDS ── */
-.card{
-  background:#fff;border:1.5px solid #E5E7EB;
-  border-radius:8px;margin-bottom:20px;overflow:hidden;
-}
-.card-head{
-  padding:16px 20px;border-bottom:1px solid #E5E7EB;
-  display:flex;align-items:center;justify-content:space-between;
-}
-.card-title{font-size:13px;font-weight:700;letter-spacing:-.01em}
-.card-body{padding:20px}
-
-/* ── FORM FIELDS ── */
-.field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
-.field:last-child{margin-bottom:0}
-.field label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#9CA3AF}
-.field input,.field textarea,.field select{
-  border:1.5px solid #E5E7EB;padding:10px 12px;font-size:13px;
-  border-radius:4px;outline:none;transition:border-color .2s;
-  background:#fff;color:#111;width:100%;
-}
-.field input:focus,.field textarea:focus{border-color:#22C55E}
-.field textarea{resize:vertical;min-height:80px;line-height:1.6}
-.field-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.field-hint{font-size:11px;color:#9CA3AF;margin-top:2px}
-
-/* ── IMAGE UPLOAD ── */
-.img-upload{
-  border:2px dashed #E5E7EB;border-radius:6px;
-  padding:24px;text-align:center;cursor:pointer;
-  transition:border-color .2s,background .2s;
-  position:relative;
-}
-.img-upload:hover{border-color:#22C55E;background:#F0FDF4}
-.img-upload input[type=file]{
-  position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;
-}
-.img-upload-icon{font-size:28px;margin-bottom:8px}
-.img-upload-text{font-size:12px;color:#6B7280;font-weight:500}
-.img-upload-hint{font-size:11px;color:#9CA3AF;margin-top:4px}
-.img-preview{
-  width:100%;max-height:160px;object-fit:cover;
-  border-radius:4px;margin-top:12px;display:none;
+button,input,textarea,select{font-family:inherit;font-size:13px}
+:root{
+  --green:#22C55E;--green-d:#16A34A;--green-bg:#F0FDF4;--green-border:#BBF7D0;
+  --ink:#0F0F0F;--mid:#6B7280;--dim:#9CA3AF;--line:#E5E7EB;--bg:#F4F5F7;
+  --sidebar:#0C0C10;--sidebar-line:rgba(255,255,255,.07);
+  --card:#fff;--danger:#EF4444;--warning:#F59E0B;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+  --shadow-lg:0 4px 16px rgba(0,0,0,.10);
 }
 
-/* ── BLOG POSTS ── */
-.post-list{display:flex;flex-direction:column;gap:0}
-.post-item{
-  display:grid;grid-template-columns:1fr auto;
-  gap:16px;align-items:center;
-  padding:14px 20px;border-bottom:1px solid #E5E7EB;
-  transition:background .15s;
-}
-.post-item:last-child{border-bottom:none}
-.post-item:hover{background:#FAFAFA}
-.post-item-title{font-size:13px;font-weight:600;color:#111;margin-bottom:3px}
-.post-item-meta{font-size:11px;color:#9CA3AF}
-.post-item-meta span{
-  display:inline-block;background:#F3F4F6;
-  padding:2px 8px;border-radius:20px;margin-right:6px;
-  font-weight:500;
-}
-.post-actions{display:flex;gap:8px}
-.icon-btn{
-  width:30px;height:30px;border-radius:4px;border:1.5px solid #E5E7EB;
-  background:#fff;cursor:pointer;display:flex;align-items:center;
-  justify-content:center;font-size:13px;transition:all .15s;
-}
-.icon-btn:hover{border-color:#22C55E;background:#F0FDF4}
-.icon-btn.del:hover{border-color:#EF4444;background:#FEF2F2}
-
-/* ── BLOG EDITOR ── */
-.editor-overlay{
-  display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);
-  z-index:500;align-items:center;justify-content:center;
-}
-.editor-overlay.open{display:flex}
-.editor-box{
-  background:#fff;width:100%;max-width:900px;max-height:92vh;
-  border-radius:10px;overflow:hidden;
-  display:flex;flex-direction:column;
-}
-
-/* Article content editor */
-.art-editor-tabs{
-  display:flex;border-bottom:1px solid #E5E7EB;
-  background:#FAFAFA;flex-shrink:0;
-}
-.art-tab{
-  padding:10px 20px;font-size:12px;font-weight:600;
-  letter-spacing:.04em;cursor:pointer;color:#9CA3AF;
-  border-bottom:2px solid transparent;margin-bottom:-1px;
-  transition:color .2s,border-color .2s;
-}
-.art-tab.active{color:#22C55E;border-color:#22C55E}
-.art-tab-panel{display:none}
-.art-tab-panel.active{display:block}
-.art-content-area{
-  width:100%;min-height:280px;
-  border:1.5px solid #E5E7EB;border-radius:4px;
-  padding:14px;font-size:13px;line-height:1.75;
-  font-family:'Inter',sans-serif;color:#111;
-  resize:vertical;outline:none;
-  transition:border-color .2s;
-}
-.art-content-area:focus{border-color:#22C55E}
-.art-ref{
-  background:#F8F9FA;border:1.5px solid #E5E7EB;
-  border-radius:6px;padding:16px;
-  font-size:11px;line-height:2;color:#6B7280;
-  font-family:monospace;
-}
-.editor-head{
-  padding:18px 24px;border-bottom:1px solid #E5E7EB;
-  display:flex;align-items:center;justify-content:space-between;
-  flex-shrink:0;
-}
-.editor-head-title{font-size:14px;font-weight:700}
-.editor-close{
-  width:28px;height:28px;border-radius:4px;border:none;
-  background:#F3F4F6;cursor:pointer;font-size:16px;
-  display:flex;align-items:center;justify-content:center;
-}
-.editor-body{padding:24px;overflow-y:auto;flex:1}
-.editor-foot{
-  padding:16px 24px;border-top:1px solid #E5E7EB;
-  display:flex;gap:10px;justify-content:flex-end;flex-shrink:0;
-}
-
-/* ── KINETIC ITEMS ── */
-.kt-item{
-  display:grid;grid-template-columns:auto 1fr 1fr;
-  gap:12px;align-items:center;
-  padding:12px 0;border-bottom:1px solid #E5E7EB;
-}
-.kt-item:last-child{border-bottom:none}
-.kt-num{
-  font-size:11px;font-weight:700;letter-spacing:.1em;
-  color:#22C55E;width:24px;
-}
-.kt-input{
-  border:1.5px solid #E5E7EB;padding:8px 10px;font-size:12px;
-  border-radius:4px;outline:none;width:100%;
-  transition:border-color .2s;
-}
-.kt-input:focus{border-color:#22C55E}
-
-/* ── SERVICE ITEMS ── */
-.svc-domain{
-  border:1.5px solid #E5E7EB;border-radius:6px;
-  margin-bottom:16px;overflow:hidden;
-}
-.svc-domain-head{
-  padding:12px 16px;background:#F8F9FA;
-  border-bottom:1px solid #E5E7EB;
-  font-size:12px;font-weight:700;letter-spacing:.06em;
-  text-transform:uppercase;color:#6B7280;
-}
-.svc-domain-body{padding:16px}
-.svc-disc-item{
-  display:grid;grid-template-columns:auto 1fr 1fr;
-  gap:10px;align-items:start;
-  padding:10px 0;border-bottom:1px solid #F3F4F6;
-}
-.svc-disc-item:last-child{border-bottom:none}
-
-/* ── TOAST ── */
-.toast{
-  position:fixed;bottom:24px;right:24px;
-  background:#111;color:#fff;
-  padding:12px 20px;border-radius:6px;
-  font-size:13px;font-weight:500;
-  transform:translateY(80px);opacity:0;
-  transition:transform .3s ease,opacity .3s ease;
-  z-index:999;display:flex;align-items:center;gap:8px;
-}
-.toast.show{transform:translateY(0);opacity:1}
-.toast-dot{width:6px;height:6px;border-radius:50%;background:#22C55E;flex-shrink:0}
-
-/* ── STATS GRID ── */
-.stats-grid{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px;
-}
-.stat-card{
-  background:#fff;border:1.5px solid #E5E7EB;border-radius:8px;
-  padding:20px;
-}
-.stat-card-n{font-size:28px;font-weight:900;letter-spacing:-.03em;color:#111;margin-bottom:4px}
-.stat-card-l{font-size:11px;font-weight:500;color:#9CA3AF;text-transform:uppercase;letter-spacing:.06em}
-
-/* ── RICH TEXT EDITOR ── */
-.rte-toolbar{
-  display:flex;align-items:center;flex-wrap:wrap;gap:3px;
-  padding:8px 10px;background:#F8F9FA;
-  border:1.5px solid #E5E7EB;border-bottom:none;
-  border-radius:4px 4px 0 0;
-}
-.rte-btn{
-  min-width:28px;height:28px;padding:0 6px;
-  border:1.5px solid transparent;border-radius:3px;
-  background:transparent;cursor:pointer;
-  font-size:12px;font-weight:700;color:#374151;
-  display:flex;align-items:center;justify-content:center;
-  transition:background .15s,border-color .15s;
-}
-.rte-btn:hover{background:#E5E7EB;border-color:#D1D5DB}
-.rte-green-btn{color:#22C55E;border-color:#BBF7D0;background:#F0FDF4}
-.rte-green-btn:hover{background:#22C55E;color:#fff;border-color:#22C55E}
-.rte-select{
-  height:28px;padding:0 6px;font-size:11px;font-weight:600;
-  border:1.5px solid #E5E7EB;border-radius:3px;
-  background:#fff;color:#374151;cursor:pointer;outline:none;
-}
-.rte-color-wrap{
-  position:relative;width:28px;height:28px;
-  display:flex;align-items:center;justify-content:center;
-  border:1.5px solid #E5E7EB;border-radius:3px;
-  cursor:pointer;overflow:hidden;background:#fff;
-}
-.rte-color{
-  position:absolute;opacity:0;width:100%;height:100%;cursor:pointer;
-}
-.rte-sep{width:1px;height:20px;background:#E5E7EB;margin:0 2px;flex-shrink:0}
-.rte-area{
-  border:1.5px solid #E5E7EB;border-radius:0 0 4px 4px;
-  min-height:320px;max-height:420px;overflow-y:auto;
-  padding:16px;font-size:15px;line-height:1.8;
-  font-family:'Inter',sans-serif;color:#111;
-  outline:none;transition:border-color .2s;
-}
-.rte-area:focus{border-color:#22C55E}
-.rte-area:empty::before{
-  content:attr(data-placeholder);
-  color:#9CA3AF;pointer-events:none;
-}
-.rte-area h2{font-size:22px;font-weight:800;letter-spacing:-.02em;margin:20px 0 8px;color:#111}
-.rte-area h3{font-size:17px;font-weight:700;margin:16px 0 6px;color:#111}
-.rte-area h4{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9CA3AF;margin:14px 0 4px}
-.rte-area p{margin-bottom:12px}
-.rte-area blockquote{border-left:3px solid #22C55E;padding-left:16px;margin:16px 0;color:#6B7280;font-style:italic}
-.rte-area ul{padding-left:20px;margin-bottom:12px}
-.rte-area ol{padding-left:20px;margin-bottom:12px}
-::-webkit-scrollbar{width:4px}
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:#E5E7EB;border-radius:4px}
+::-webkit-scrollbar-thumb{background:var(--line);border-radius:10px}
+
+/* ══════════════════════════════════════════
+   LOGIN
+══════════════════════════════════════════ */
+#login{position:fixed;inset:0;background:#fff;display:flex;align-items:center;justify-content:center;z-index:9999}
+.login-wrap{width:100%;max-width:360px;padding:0 24px}
+.login-logo{font-size:20px;font-weight:900;letter-spacing:-.02em;margin-bottom:6px}
+.login-logo span{color:var(--green)}
+.login-sub{font-size:12px;color:var(--dim);margin-bottom:32px}
+.login-field{margin-bottom:14px}
+.login-field label{display:block;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-bottom:6px}
+.login-field input{width:100%;border:1.5px solid var(--line);padding:11px 14px;border-radius:5px;outline:none;font-size:13px;transition:border-color .2s}
+.login-field input:focus{border-color:var(--green)}
+.login-err{font-size:11px;color:var(--danger);height:16px;margin-bottom:10px}
+.login-btn{width:100%;background:var(--ink);color:#fff;border:none;padding:12px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border-radius:5px;cursor:pointer;transition:background .2s}
+.login-btn:hover{background:var(--green)}
+.login-hint{font-size:11px;color:var(--dim);text-align:center;margin-top:16px}
+
+/* ══════════════════════════════════════════
+   LAYOUT
+══════════════════════════════════════════ */
+#app{display:none;height:100vh;overflow:hidden}
+.shell{display:grid;grid-template-columns:220px 1fr;height:100vh}
+
+/* ══════════════════════════════════════════
+   SIDEBAR
+══════════════════════════════════════════ */
+.sidebar{background:var(--sidebar);display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden}
+.sb-logo{padding:20px 18px 16px;border-bottom:1px solid var(--sidebar-line);flex-shrink:0}
+.sb-logo-text{font-size:14px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:#fff}
+.sb-logo-text span{color:var(--green)}
+.sb-logo-sub{font-size:9px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.2);margin-top:3px}
+.sb-nav{flex:1;padding:8px 0}
+.sb-section{font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.2);padding:14px 18px 5px}
+.sb-item{display:flex;align-items:center;gap:9px;padding:9px 18px;font-size:12px;font-weight:500;color:rgba(255,255,255,.45);cursor:pointer;border-left:2px solid transparent;transition:all .15s;position:relative}
+.sb-item:hover{background:rgba(255,255,255,.04);color:rgba(255,255,255,.75)}
+.sb-item.active{background:rgba(34,197,94,.1);color:var(--green);border-left-color:var(--green)}
+.sb-item-icon{font-size:13px;width:18px;text-align:center;flex-shrink:0}
+.sb-item-badge{margin-left:auto;background:rgba(255,255,255,.1);color:rgba(255,255,255,.4);font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px;min-width:18px;text-align:center}
+.sb-item.active .sb-item-badge{background:rgba(34,197,94,.2);color:var(--green)}
+.sb-foot{padding:14px 18px;border-top:1px solid var(--sidebar-line);flex-shrink:0;display:flex;flex-direction:column;gap:8px}
+.sb-token-status{font-size:10px;padding:6px 10px;border-radius:4px;background:rgba(255,255,255,.04);color:rgba(255,255,255,.3);display:flex;align-items:center;gap:6px}
+.sb-token-dot{width:6px;height:6px;border-radius:50%;background:var(--dim);flex-shrink:0}
+.sb-token-dot.ok{background:var(--green)}
+.sb-logout{background:rgba(255,255,255,.06);color:rgba(255,255,255,.4);border:none;padding:8px 12px;font-size:11px;font-weight:600;cursor:pointer;border-radius:4px;text-align:left;width:100%;transition:all .2s;letter-spacing:.02em}
+.sb-logout:hover{background:rgba(239,68,68,.15);color:var(--danger)}
+
+/* ══════════════════════════════════════════
+   MAIN AREA
+══════════════════════════════════════════ */
+.main{display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
+.topbar{background:#fff;border-bottom:1px solid var(--line);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:12px}
+.topbar-left{display:flex;align-items:center;gap:10px}
+.topbar-title{font-size:14px;font-weight:700;letter-spacing:-.01em;color:var(--ink)}
+.topbar-path{font-size:11px;color:var(--dim);padding:3px 8px;background:var(--bg);border-radius:3px;font-weight:500}
+.topbar-right{display:flex;align-items:center;gap:8px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;border-radius:4px;border:none;transition:all .2s;white-space:nowrap}
+.btn-sm{padding:6px 12px;font-size:10px}
+.btn-primary{background:var(--green);color:#fff}
+.btn-primary:hover{background:var(--green-d)}
+.btn-secondary{background:#fff;color:var(--ink);border:1.5px solid var(--line)}
+.btn-secondary:hover{background:var(--bg);border-color:#D1D5DB}
+.btn-danger{background:#FEF2F2;color:var(--danger);border:1.5px solid #FECACA}
+.btn-danger:hover{background:var(--danger);color:#fff}
+.btn-ghost{background:transparent;color:var(--mid);border:1.5px solid var(--line)}
+.btn-ghost:hover{background:#fff}
+.btn:disabled{opacity:.45;pointer-events:none}
+.publish-status{font-size:10px;font-weight:600;letter-spacing:.06em;color:var(--dim);display:flex;align-items:center;gap:5px}
+.publish-dot{width:6px;height:6px;border-radius:50%;background:var(--dim)}
+.publish-dot.live{background:var(--green);box-shadow:0 0 0 3px rgba(34,197,94,.2)}
+.publish-dot.saving{background:var(--warning);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+.content{flex:1;overflow-y:auto;padding:24px}
+
+/* ══════════════════════════════════════════
+   PANELS
+══════════════════════════════════════════ */
+.panel{display:none;animation:fadein .2s ease}
+.panel.active{display:block}
+@keyframes fadein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+/* ══════════════════════════════════════════
+   CARDS
+══════════════════════════════════════════ */
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;margin-bottom:16px;box-shadow:var(--shadow);overflow:hidden}
+.card-head{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.card-title{font-size:12px;font-weight:700;letter-spacing:-.01em;color:var(--ink)}
+.card-desc{font-size:11px;color:var(--dim);margin-top:2px;font-weight:400}
+.card-body{padding:18px}
+.card-body.tight{padding:12px 18px}
+.card-foot{padding:12px 18px;border-top:1px solid var(--line);background:#FAFAFA;display:flex;align-items:center;justify-content:flex-end;gap:8px}
+
+/* ══════════════════════════════════════════
+   FORM FIELDS
+══════════════════════════════════════════ */
+.field{margin-bottom:14px}
+.field:last-child{margin-bottom:0}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.field-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.field label{display:block;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-bottom:5px}
+.field input[type=text],.field input[type=url],.field input[type=email],.field input[type=password],
+.field textarea,.field select{width:100%;border:1.5px solid var(--line);padding:9px 11px;border-radius:4px;outline:none;font-size:13px;color:var(--ink);background:#fff;transition:border-color .2s;line-height:1.5}
+.field input:focus,.field textarea:focus{border-color:var(--green)}
+.field textarea{resize:vertical;min-height:72px;line-height:1.7}
+.field-hint{font-size:10px;color:var(--dim);margin-top:4px;line-height:1.5}
+.field-hint.warn{color:var(--warning)}
+.field-hint.ok{color:var(--green)}
+.char-count{font-size:10px;color:var(--dim);text-align:right;margin-top:2px}
+.field input[type=range]{width:100%;accent-color:var(--green);margin-top:4px}
+
+/* Section subheading */
+.section-label{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);padding:14px 0 8px;border-bottom:1px solid var(--line);margin-bottom:14px}
+
+/* ══════════════════════════════════════════
+   IMAGE UPLOAD
+══════════════════════════════════════════ */
+.img-drop{border:2px dashed var(--line);border-radius:6px;padding:20px;text-align:center;cursor:pointer;transition:all .2s;position:relative;background:#FAFAFA}
+.img-drop:hover{border-color:var(--green);background:var(--green-bg)}
+.img-drop.has-img{border-style:solid;border-color:var(--green-border);background:var(--green-bg)}
+.img-drop input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.img-drop-icon{font-size:22px;margin-bottom:6px;color:var(--dim)}
+.img-drop-text{font-size:12px;font-weight:600;color:var(--mid)}
+.img-drop-hint{font-size:10px;color:var(--dim);margin-top:3px}
+.img-preview{width:100%;max-height:180px;object-fit:cover;border-radius:5px;margin-top:10px;display:none;border:1px solid var(--green-border)}
+.img-clear{display:none;margin-top:6px;font-size:10px;color:var(--danger);cursor:pointer;background:none;border:none;font-weight:600;text-decoration:underline}
+
+/* ══════════════════════════════════════════
+   KINETIC ROWS
+══════════════════════════════════════════ */
+.kt-row-item{display:grid;grid-template-columns:24px 1fr 1fr;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid #F3F4F6}
+.kt-row-item:last-child{border-bottom:none}
+.kt-num{font-size:10px;font-weight:800;color:var(--green);letter-spacing:.06em}
+.kt-inp{border:1.5px solid var(--line);padding:7px 10px;font-size:12px;border-radius:4px;outline:none;width:100%;transition:border-color .2s}
+.kt-inp:focus{border-color:var(--green)}
+
+/* ══════════════════════════════════════════
+   SERVICES DISCIPLINES
+══════════════════════════════════════════ */
+.disc-item{display:grid;grid-template-columns:24px 1fr 1fr;gap:10px;align-items:start;padding:8px 0;border-bottom:1px solid #F3F4F6}
+.disc-item:last-child{border-bottom:none}
+
+/* ══════════════════════════════════════════
+   DASHBOARD STATS
+══════════════════════════════════════════ */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.stat-card{background:#fff;border:1px solid var(--line);border-radius:8px;padding:16px 18px;box-shadow:var(--shadow)}
+.stat-n{font-size:26px;font-weight:900;letter-spacing:-.04em;color:var(--ink)}
+.stat-l{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-top:3px}
+.stat-sub{font-size:10px;color:var(--green);margin-top:4px;font-weight:600}
+
+/* ══════════════════════════════════════════
+   BLOG POSTS LIST
+══════════════════════════════════════════ */
+.post-table{width:100%;border-collapse:collapse}
+.post-table th{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);padding:8px 14px;border-bottom:1px solid var(--line);text-align:left;background:#FAFAFA}
+.post-table td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+.post-table tr:last-child td{border-bottom:none}
+.post-table tr:hover td{background:#FAFAFA}
+.post-title-cell{font-weight:600;font-size:12px;color:var(--ink);max-width:280px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.post-cat-badge{display:inline-block;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:20px;background:var(--green-bg);color:var(--green-d);border:1px solid var(--green-border)}
+.post-meta{font-size:11px;color:var(--dim)}
+.empty-state{padding:48px;text-align:center;color:var(--dim)}
+.empty-state-icon{font-size:32px;margin-bottom:12px}
+.empty-state-text{font-size:13px;font-weight:600;color:var(--mid);margin-bottom:6px}
+.empty-state-sub{font-size:12px}
+
+/* ══════════════════════════════════════════
+   ARTICLE EDITOR MODAL
+══════════════════════════════════════════ */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;align-items:flex-start;justify-content:center;padding:24px;overflow-y:auto}
+.overlay.open{display:flex}
+.modal{background:#fff;width:100%;max-width:960px;border-radius:10px;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.18);margin:auto;display:flex;flex-direction:column;max-height:calc(100vh - 48px)}
+.modal-head{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.modal-title{font-size:14px;font-weight:700}
+.modal-close{width:28px;height:28px;background:#F3F4F6;border:none;border-radius:4px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:var(--mid);transition:all .2s}
+.modal-close:hover{background:var(--danger);color:#fff}
+.modal-tabs{display:flex;border-bottom:1px solid var(--line);background:#FAFAFA;flex-shrink:0}
+.modal-tab{padding:10px 18px;font-size:11px;font-weight:700;letter-spacing:.04em;cursor:pointer;color:var(--dim);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s}
+.modal-tab.active{color:var(--green);border-bottom-color:var(--green);background:#fff}
+.modal-tab-panel{display:none}
+.modal-tab-panel.active{display:block}
+.modal-body{padding:20px;overflow-y:auto;flex:1}
+.modal-foot{padding:14px 20px;border-top:1px solid var(--line);display:flex;align-items:center;gap:8px;justify-content:flex-end;flex-shrink:0;background:#FAFAFA}
+
+/* ══════════════════════════════════════════
+   RICH TEXT EDITOR
+══════════════════════════════════════════ */
+.rte-wrap{border:1.5px solid var(--line);border-radius:6px;overflow:hidden;transition:border-color .2s}
+.rte-wrap:focus-within{border-color:var(--green)}
+.rte-toolbar{display:flex;flex-wrap:wrap;gap:2px;padding:6px 8px;background:#F8F9FA;border-bottom:1px solid var(--line)}
+.rte-btn{min-width:26px;height:26px;padding:0 5px;border:1px solid transparent;border-radius:3px;background:transparent;cursor:pointer;font-size:11px;font-weight:700;color:#374151;display:inline-flex;align-items:center;justify-content:center;transition:all .15s;white-space:nowrap}
+.rte-btn:hover{background:var(--line);border-color:#D1D5DB}
+.rte-btn.active{background:var(--green-bg);border-color:var(--green-border);color:var(--green)}
+.rte-sep{width:1px;height:18px;background:var(--line);margin:0 2px;align-self:center}
+.rte-select{height:26px;padding:0 6px;font-size:11px;font-weight:600;border:1px solid var(--line);border-radius:3px;background:#fff;color:#374151;cursor:pointer;outline:none}
+.rte-color-btn{position:relative;width:26px;height:26px;border:1px solid var(--line);border-radius:3px;overflow:hidden;cursor:pointer;background:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#374151}
+.rte-color-btn input[type=color]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.rte-area{min-height:360px;max-height:500px;overflow-y:auto;padding:20px 24px;font-size:15px;line-height:1.85;font-family:'Inter',sans-serif;color:var(--ink);outline:none;background:#fff}
+.rte-area:empty::before{content:attr(data-placeholder);color:var(--dim);pointer-events:none}
+.rte-area h2{font-size:22px;font-weight:800;letter-spacing:-.025em;margin:20px 0 10px;color:var(--ink)}
+.rte-area h3{font-size:17px;font-weight:700;margin:16px 0 8px;color:var(--ink)}
+.rte-area h4{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin:14px 0 6px}
+.rte-area p{margin:0 0 12px}
+.rte-area blockquote{border-left:3px solid var(--green);padding:2px 16px;margin:16px 0;color:var(--mid);font-style:italic}
+.rte-area ul,.rte-area ol{padding-left:22px;margin:0 0 12px}
+.rte-area li{margin:5px 0}
+.rte-area a{color:var(--green);text-decoration:underline}
+.rte-area img{max-width:100%;border-radius:6px;margin:12px 0;display:block}
+.rte-area hr{border:none;border-top:1px solid var(--line);margin:22px 0}
+.rte-area table{width:100%;border-collapse:collapse;margin:16px 0;font-size:14px}
+.rte-area td,.rte-area th{border:1px solid var(--line);padding:8px 12px}
+.rte-area th{background:#F9FAFB;font-weight:600}
+.rte-area code{background:#F3F4F6;padding:2px 6px;border-radius:3px;font-family:monospace;font-size:13px}
+.rte-area pre{background:#F8F9FA;border:1px solid var(--line);padding:14px 16px;border-radius:5px;overflow-x:auto;margin:14px 0}
+.rte-area pre code{background:transparent;padding:0}
+.rte-char-count{font-size:10px;color:var(--dim);padding:5px 10px;background:#F8F9FA;border-top:1px solid var(--line);text-align:right}
+
+/* ══════════════════════════════════════════
+   TOKEN SETTINGS MODAL
+══════════════════════════════════════════ */
+.token-modal{background:#fff;width:100%;max-width:480px;border-radius:10px;overflow:hidden;box-shadow:var(--shadow-lg);margin:auto}
+
+/* ══════════════════════════════════════════
+   ALERT / INFO BOXES
+══════════════════════════════════════════ */
+.alert{padding:12px 14px;border-radius:5px;font-size:12px;line-height:1.6;margin-bottom:16px}
+.alert-green{background:var(--green-bg);border:1px solid var(--green-border);color:#166534}
+.alert-yellow{background:#FFFBEB;border:1px solid #FDE68A;color:#92400E}
+.alert-red{background:#FEF2F2;border:1px solid #FECACA;color:#991B1B}
+.alert-blue{background:#EFF6FF;border:1px solid #BFDBFE;color:#1E40AF}
+.alert strong{font-weight:700}
+
+/* ══════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════ */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--ink);color:#fff;padding:11px 18px;border-radius:6px;font-size:12px;font-weight:500;transform:translateY(80px);opacity:0;transition:all .3s cubic-bezier(.16,1,.3,1);z-index:9999;display:flex;align-items:center;gap:8px;max-width:340px;box-shadow:var(--shadow-lg)}
+.toast.show{transform:translateY(0);opacity:1}
+.toast-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.toast-dot.green{background:var(--green)}
+.toast-dot.red{background:var(--danger)}
+.toast-dot.yellow{background:var(--warning)}
+
+/* ══════════════════════════════════════════
+   SETTINGS PANEL
+══════════════════════════════════════════ */
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--line)}
+.setting-row:last-child{border-bottom:none}
+.setting-info{}
+.setting-label{font-size:13px;font-weight:600;color:var(--ink)}
+.setting-desc{font-size:11px;color:var(--dim);margin-top:2px}
+.setting-action{flex-shrink:0;margin-left:24px}
+
+/* ══════════════════════════════════════════
+   PREVIEW LINK
+══════════════════════════════════════════ */
+.preview-bar{background:linear-gradient(135deg,#0C0C10,#1a1a2e);border-radius:8px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.preview-url{font-size:12px;color:rgba(255,255,255,.5);font-family:monospace}
+.preview-url strong{color:#fff}
+
+/* ══════════════════════════════════════════
+   UNSAVED INDICATOR
+══════════════════════════════════════════ */
+.unsaved-dot{display:none;width:6px;height:6px;border-radius:50%;background:var(--warning);margin-left:6px}
+.unsaved-dot.show{display:inline-block}
+
+/* ══════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════ */
+@media(max-width:900px){
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .field-row-3{grid-template-columns:1fr 1fr}
+}
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
+<!-- ══════════════════════════════════════════
+     LOGIN
+══════════════════════════════════════════ -->
 <div id="login">
-  <div class="login-box">
-    <div>
-      <div class="login-logo">NUMICS<span>.</span></div>
-      <div class="login-title">Admin Panel — sign in to continue</div>
-    </div>
+  <div class="login-wrap">
+    <div class="login-logo">NUMICS<span>.</span></div>
+    <div class="login-sub">Content Management System — sign in to continue</div>
     <div class="login-field">
       <label>Password</label>
-      <input type="password" id="pwInput" placeholder="Enter password" autocomplete="current-password">
+      <input type="password" id="pwInput" placeholder="Enter admin password" autocomplete="current-password">
     </div>
-    <div class="login-err" id="loginErr">Incorrect password. Try again.</div>
-    <button class="login-btn" onclick="doLogin()">Sign In</button>
+    <div class="login-err" id="loginErr"></div>
+    <button class="login-btn" id="loginBtn">Sign In →</button>
+    <div class="login-hint">NUMICS CMS v3.0 · numics.org</div>
   </div>
 </div>
 
-<!-- APP -->
+<!-- ══════════════════════════════════════════
+     APP SHELL
+══════════════════════════════════════════ -->
 <div id="app">
-<div class="layout">
+<div class="shell">
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="sidebar-logo">NUMICS<span>.</span></div>
-    <nav class="sidebar-nav">
-      <div class="nav-section">Content</div>
-      <div class="nav-item active" onclick="showPanel('dashboard')">
-        <span class="nav-icon">◉</span> Dashboard
-      </div>
-      <div class="nav-item" onclick="showPanel('hero')">
-        <span class="nav-icon">⬡</span> Hero
-      </div>
-      <div class="nav-item" onclick="showPanel('kinetic')">
-        <span class="nav-icon">⟳</span> Kinetic Text
-      </div>
-      <div class="nav-item" onclick="showPanel('about')">
-        <span class="nav-icon">◎</span> About
-      </div>
-      <div class="nav-item" onclick="showPanel('services')">
-        <span class="nav-icon">⬢</span> Services
-      </div>
-      <div class="nav-item" onclick="showPanel('blog')">
-        <span class="nav-icon">✦</span> Blog / Insights
-      </div>
-      <div class="nav-item" onclick="showPanel('contact')">
-        <span class="nav-icon">◌</span> Contact
-      </div>
-    </nav>
-    <div class="sidebar-foot">
-      <button class="logout-btn" onclick="doLogout()">← Sign out</button>
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-text">NUMICS<span>.</span></div>
+    <div class="sb-logo-sub">CMS Dashboard</div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-section">Overview</div>
+    <div class="sb-item active" data-panel="dashboard" onclick="goPanel(this)">
+      <span class="sb-item-icon">◉</span> Dashboard
     </div>
-  </aside>
 
-  <!-- MAIN -->
-  <main class="main">
-    <div class="topbar">
+    <div class="sb-section">Website Sections</div>
+    <div class="sb-item" data-panel="hero" onclick="goPanel(this)">
+      <span class="sb-item-icon">⬡</span> Hero
+      <span class="unsaved-dot" id="dot-hero"></span>
+    </div>
+    <div class="sb-item" data-panel="kinetic" onclick="goPanel(this)">
+      <span class="sb-item-icon">⟳</span> Kinetic Text
+      <span class="unsaved-dot" id="dot-kinetic"></span>
+    </div>
+    <div class="sb-item" data-panel="about" onclick="goPanel(this)">
+      <span class="sb-item-icon">◎</span> About &amp; Founder
+      <span class="unsaved-dot" id="dot-about"></span>
+    </div>
+    <div class="sb-item" data-panel="services" onclick="goPanel(this)">
+      <span class="sb-item-icon">⬢</span> Services
+      <span class="unsaved-dot" id="dot-services"></span>
+    </div>
+    <div class="sb-item" data-panel="contact" onclick="goPanel(this)">
+      <span class="sb-item-icon">◌</span> Contact &amp; Footer
+      <span class="unsaved-dot" id="dot-contact"></span>
+    </div>
+
+    <div class="sb-section">Content</div>
+    <div class="sb-item" data-panel="blog" onclick="goPanel(this)">
+      <span class="sb-item-icon">✦</span> Blog / Insights
+      <span class="sb-item-badge" id="postCountBadge">0</span>
+    </div>
+
+    <div class="sb-section">System</div>
+    <div class="sb-item" data-panel="settings" onclick="goPanel(this)">
+      <span class="sb-item-icon">⚙</span> Settings
+    </div>
+  </nav>
+  <div class="sb-foot">
+    <div class="sb-token-status" id="sbTokenStatus">
+      <div class="sb-token-dot" id="sbTokenDot"></div>
+      <span id="sbTokenLabel">No token set</span>
+    </div>
+    <button class="sb-logout" onclick="doLogout()">← Sign out</button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-left">
       <div class="topbar-title" id="topbarTitle">Dashboard</div>
-      <div class="topbar-actions">
-        <button class="btn btn-secondary" onclick="saveAll()">Save Changes</button>
-        <button class="btn btn-secondary" onclick="exportSite()">Export ↓</button>
-        <button class="btn btn-primary" id="publishBtn" onclick="publishToGitHub()" style="background:#22C55E">Publish Live ↑</button>
-        <button class="btn btn-secondary" onclick="openGHSettings()" title="GitHub Token Settings" style="padding:9px 14px;font-size:12px">Token</button>
+      <div class="topbar-path" id="topbarPath">numics.org</div>
+    </div>
+    <div class="topbar-right">
+      <div class="publish-status" id="publishStatus">
+        <div class="publish-dot" id="publishDot"></div>
+        <span id="publishLabel">Checking...</span>
+      </div>
+      <button class="btn btn-secondary btn-sm" onclick="reloadFromGitHub()">↺ Reload</button>
+      <button class="btn btn-secondary btn-sm" onclick="saveLocal()">Save Draft</button>
+      <button class="btn btn-primary btn-sm" id="publishBtn" onclick="publishToGitHub()">↑ Publish Live</button>
+      <button class="btn btn-ghost btn-sm" onclick="openTokenModal()" title="GitHub Token Settings">Token</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ─── DASHBOARD ─── -->
+    <div class="panel active" id="panel-dashboard">
+      <div class="preview-bar">
+        <div>
+          <div style="font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:4px">Live Website</div>
+          <div class="preview-url"><strong>numics.org</strong></div>
+        </div>
+        <a href="https://numics.org" target="_blank" class="btn btn-sm" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.15)">View Live Site ↗</a>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-n" id="ds-posts">0</div>
+          <div class="stat-l">Blog Posts</div>
+          <div class="stat-sub">Published articles</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-n">5</div>
+          <div class="stat-l">Sections</div>
+          <div class="stat-sub">Editable website sections</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-n" id="ds-saved">—</div>
+          <div class="stat-l">Last Saved</div>
+          <div class="stat-sub">Local draft time</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-n" id="ds-pub">—</div>
+          <div class="stat-l">Last Published</div>
+          <div class="stat-sub">Live site update</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div><div class="card-title">Quick Start Guide</div><div class="card-desc">How to edit and publish your website</div></div></div>
+        <div class="card-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <div class="alert alert-blue">
+              <strong>1. Edit content</strong><br>
+              Select any section from the left sidebar. Edit the fields and click <strong>Save Draft</strong> when done. A yellow dot shows unsaved changes.
+            </div>
+            <div class="alert alert-green">
+              <strong>2. Publish live</strong><br>
+              Click <strong>Publish Live</strong> in the top bar. Your changes go to GitHub and the live site updates within ~60 seconds.
+            </div>
+            <div class="alert alert-blue">
+              <strong>3. Add blog posts</strong><br>
+              Go to <strong>Blog / Insights</strong> → <strong>New Post</strong>. Fill in title, category, excerpt, upload a cover image, and write the full article.
+            </div>
+            <div class="alert alert-yellow">
+              <strong>4. First time?</strong><br>
+              Click <strong>Token</strong> in the top bar to add your GitHub Personal Access Token. Required to publish. Create one at github.com/settings/tokens.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div><div class="card-title">Recent Posts</div></div>
+          <button class="btn btn-primary btn-sm" onclick="goPanel(document.querySelector('[data-panel=blog]'));openEditor(null)">+ New Post</button>
+        </div>
+        <div id="dash-posts-list">
+          <div class="empty-state">
+            <div class="empty-state-icon">✦</div>
+            <div class="empty-state-text">No posts yet</div>
+            <div class="empty-state-sub">Go to Blog / Insights to add your first article</div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="content">
-
-      <!-- DASHBOARD -->
-      <div class="panel active" id="panel-dashboard">
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-card-n" id="ds-posts">0</div>
-            <div class="stat-card-l">Blog posts</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-card-n" id="ds-sections">6</div>
-            <div class="stat-card-l">Sections</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-card-n" id="ds-saved">—</div>
-            <div class="stat-card-l">Last saved</div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-head"><div class="card-title">Quick Guide</div></div>
-          <div class="card-body">
-            <p style="font-size:13px;line-height:1.75;color:#6B7280">
-              <strong style="color:#111">How to edit:</strong> Select a section from the left sidebar → edit any field → click <strong>Save Changes</strong>.<br><br>
-              <strong style="color:#111">How to publish:</strong> Click <strong>Export Site ↓</strong> → download <code style="background:#F3F4F6;padding:2px 6px;border-radius:3px">index.html</code> → upload to Netlify Drop.<br><br>
-              <strong style="color:#111">Blog posts:</strong> Go to Blog / Insights → Add New Post → fill in the fields → Save.<br><br>
-              <strong style="color:#111">Images:</strong> Click the image upload area in any section → select your file → it saves automatically.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- HERO -->
-      <div class="panel" id="panel-hero">
-        <div class="card">
-          <div class="card-head"><div class="card-title">Hero Section — Text</div></div>
-          <div class="card-body">
+    <!-- ─── HERO ─── -->
+    <div class="panel" id="panel-hero">
+      <div class="card">
+        <div class="card-head"><div><div class="card-title">Hero Text</div><div class="card-desc">The large headline and tagline visible on the homepage</div></div></div>
+        <div class="card-body">
+          <div class="field-row">
             <div class="field">
-              <label>Pre-text (white text before Shift)</label>
-              <input type="text" id="h-pre" placeholder="Sustainability is a">
-              <div class="field-hint">White text that appears before "Shift." in the hero</div>
+              <label>Pre-text (white text before "Shift.")</label>
+              <input type="text" id="h-pre" placeholder="Sustainability is a" oninput="markDirty('hero')">
+              <div class="field-hint">Appears before the animated "Shift." word</div>
             </div>
             <div class="field">
-              <label>Tagline</label>
-              <input type="text" id="h-tag" placeholder="We are the architects.">
+              <label>Tagline (shown below hero headline)</label>
+              <input type="text" id="h-tag" placeholder="We are the architects." oninput="markDirty('hero')">
             </div>
+          </div>
+          <div class="field-row">
             <div class="field">
               <label>CTA Button Text</label>
-              <input type="text" id="h-cta" placeholder="Request a Consultation">
+              <input type="text" id="h-cta" placeholder="Request a Consultation" oninput="markDirty('hero')">
             </div>
             <div class="field">
               <label>CTA Button Link</label>
-              <input type="text" id="h-link" placeholder="https://cal.com/your-link">
+              <input type="text" id="h-link" placeholder="https://cal.com/your-link" oninput="markDirty('hero')">
+              <div class="field-hint">Use a Cal.com link, mailto:, or any URL</div>
+            </div>
+          </div>
+          <div class="field">
+            <label>Navbar CTA Button Text</label>
+            <input type="text" id="h-navcta" placeholder="Request Consultation" oninput="markDirty('hero')">
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div><div class="card-title">Hero Background</div><div class="card-desc">Video or image — video takes priority when both are set</div></div></div>
+        <div class="card-body">
+          <div class="field">
+            <label>Background Video Filename</label>
+            <input type="text" id="h-video" placeholder="hero-video.mp4" oninput="markDirty('hero')">
+            <div class="field-hint">Place the .mp4 file in the same folder as index.html. Enter the exact filename here. Leave blank to use an image or default particles.</div>
+          </div>
+          <div class="field">
+            <label>Canvas / Particle Overlay Opacity</label>
+            <input type="range" id="h-opacity" min="0" max="1" step="0.05" value="0.55" oninput="document.getElementById('h-opacity-val').textContent=this.value;markDirty('hero')">
+            <div class="field-hint">Current: <strong id="h-opacity-val">0.55</strong> — 0 = full video, 1 = full particle overlay</div>
+          </div>
+          <div class="field">
+            <label>Background Image (alternative to video)</label>
+            <div class="img-drop" id="hBgDrop">
+              <input type="file" accept="image/jpeg,image/png,image/webp" onchange="handleImgDrop(this,'h-bg-img','hBgPrev','hBgDrop','hBgClear')">
+              <div class="img-drop-icon">🖼</div>
+              <div class="img-drop-text">Click to upload background image</div>
+              <div class="img-drop-hint">JPG, PNG, WebP · Recommended: 1920×1080px · Max 4MB</div>
+              <img id="hBgPrev" class="img-preview">
+            </div>
+            <button class="img-clear" id="hBgClear" onclick="clearImg('h-bg-img','hBgPrev','hBgDrop','hBgClear')">Remove image</button>
+            <input type="hidden" id="h-bg-img">
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div><div class="card-title">Logo</div><div class="card-desc">Shown in the navbar next to NUMICS.</div></div></div>
+        <div class="card-body">
+          <div class="field">
+            <label>Logo Image (PNG or SVG recommended)</label>
+            <div class="img-drop" id="hLogoDrop">
+              <input type="file" accept="image/png,image/svg+xml,image/jpeg" onchange="handleImgDrop(this,'h-logo-img','hLogoPrev','hLogoDrop','hLogoClear')">
+              <div class="img-drop-icon">N.</div>
+              <div class="img-drop-text">Click to upload logo</div>
+              <div class="img-drop-hint">PNG or SVG · Will display at 32×32px in navbar</div>
+              <img id="hLogoPrev" class="img-preview">
+            </div>
+            <button class="img-clear" id="hLogoClear" onclick="clearImg('h-logo-img','hLogoPrev','hLogoDrop','hLogoClear')">Remove logo</button>
+            <input type="hidden" id="h-logo-img">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── KINETIC ─── -->
+    <div class="panel" id="panel-kinetic">
+      <div class="card">
+        <div class="card-head">
+          <div><div class="card-title">Rotating "Where X meets Y" Statements</div><div class="card-desc">Six pairs that cycle automatically on the homepage</div></div>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-blue" style="margin-bottom:14px">Each pair is shown as: <strong>where [Left] meets [Right]</strong>. The right word appears in green.</div>
+          <div id="kt-list"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div><div class="card-title">Final Statement</div><div class="card-desc">Shown after all six pairs cycle through</div></div></div>
+        <div class="card-body">
+          <div class="field-row">
+            <div class="field">
+              <label>Top label line</label>
+              <input type="text" id="kt-final-top" placeholder="Where all of it meets" oninput="markDirty('kinetic')">
+            </div>
+            <div class="field">
+              <label>Main statement (large text)</label>
+              <input type="text" id="kt-final-bot" placeholder="The Bottom Line" oninput="markDirty('kinetic')">
+              <div class="field-hint">A dot (.) is added automatically at the end</div>
             </div>
           </div>
         </div>
+      </div>
+    </div>
 
-        <div class="card">
-          <div class="card-head"><div class="card-title">Hero Background — Video</div></div>
-          <div class="card-body">
+    <!-- ─── ABOUT ─── -->
+    <div class="panel" id="panel-about">
+      <div class="card">
+        <div class="card-head"><div><div class="card-title">Main Headline</div></div></div>
+        <div class="card-body">
+          <div class="field-row">
             <div class="field">
-              <label>Video File Name</label>
-              <input type="text" id="h-video" placeholder="hero-video.mp4">
-              <div class="field-hint">Place your .mp4 file in the same folder as index.html. Enter the filename here exactly — e.g. <code style="background:#F3F4F6;padding:2px 6px;border-radius:3px">hero-video.mp4</code></div>
+              <label>Headline Line 1 (black text)</label>
+              <input type="text" id="ab-h1" placeholder="We transform complexity" oninput="markDirty('about')">
             </div>
             <div class="field">
-              <label>Canvas Overlay Opacity</label>
-              <input type="range" id="h-opacity" min="0" max="1" step="0.05" value="0.55"
-                style="width:100%;accent-color:#22C55E"
-                oninput="document.getElementById('h-opacity-val').textContent=this.value">
-              <div class="field-hint">Current: <strong id="h-opacity-val">0.55</strong> — lower = more video visible, higher = more particles visible</div>
-            </div>
-            <div style="background:#F0FDF4;border:1.5px solid #BBF7D0;border-radius:6px;padding:16px;margin-top:4px">
-              <p style="font-size:12px;color:#166534;line-height:1.7;margin:0">
-                <strong>How it works:</strong> The video plays behind the hero text. The green particle canvas sits on top at the opacity you set above. After saving and exporting, both will appear together — video underneath, animation on top.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-head"><div class="card-title">Logo (shown in navbar next to NUMICS.)</div></div>
-          <div class="card-body">
-            <div class="field">
-              <label>Logo Image</label>
-              <div class="img-upload">
-                <div class="img-upload-icon">N.</div>
-                <div class="img-upload-text">Click to upload your logo</div>
-                <div class="img-upload-hint">PNG or SVG recommended — will appear as 32x32px in navbar</div>
-                <input type="file" accept="image/*" onchange="handleImg(this,'h-logo-img','h-logo-prev')">
-                <img id="h-logo-prev" class="img-preview">
-              </div>
-              <input type="hidden" id="h-logo-img">
-            </div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-head"><div class="card-title">Hero Background — Image (alternative to video)</div></div>
-          <div class="card-body">
-            <div class="field">
-              <label>Background Image</label>
-              <div class="img-upload">
-                <div class="img-upload-icon">🖼</div>
-                <div class="img-upload-text">Click to upload or drag & drop</div>
-                <div class="img-upload-hint">JPG, PNG — recommended 1920×1080px minimum</div>
-                <input type="file" accept="image/*" onchange="handleImg(this,'h-bg-img','h-bg-prev')">
-                <img id="h-bg-prev" class="img-preview">
-              </div>
-              <input type="hidden" id="h-bg-img">
-              <div class="field-hint" style="margin-top:8px">Use either video OR image — not both. Video takes priority if both are set.</div>
+              <label>Headline Line 2 (green text)</label>
+              <input type="text" id="ab-h2" placeholder="into better decisions." oninput="markDirty('about')">
             </div>
           </div>
         </div>
       </div>
 
-      <!-- KINETIC -->
-      <div class="panel" id="panel-kinetic">
-        <div class="card">
-          <div class="card-head"><div class="card-title">Kinetic Typography — "Where X meets Y" Statements</div></div>
-          <div class="card-body">
-            <p style="font-size:12px;color:#9CA3AF;margin-bottom:16px">Edit the six rotating statements. Each has a left word and a right word in green.</p>
-            <div id="kt-list"></div>
+      <div class="card">
+        <div class="card-head"><div><div class="card-title">Statistics</div><div class="card-desc">Displayed below the headline</div></div></div>
+        <div class="card-body">
+          <div class="field-row">
+            <div class="field">
+              <label>Stat 1 — Number/Value</label>
+              <input type="text" id="ab-s1n" placeholder="7+" oninput="markDirty('about')">
+            </div>
+            <div class="field">
+              <label>Stat 1 — Label</label>
+              <input type="text" id="ab-s1l" placeholder="Years cross-sector experience" oninput="markDirty('about')">
+            </div>
           </div>
-        </div>
-        <div class="card">
-          <div class="card-head"><div class="card-title">Final Statement</div></div>
-          <div class="card-body">
-            <div class="field-row">
-              <div class="field">
-                <label>Top line</label>
-                <input type="text" id="kt-final-top" placeholder="Where all of it meets">
-              </div>
-              <div class="field">
-                <label>Bottom line</label>
-                <input type="text" id="kt-final-bot" placeholder="The Bottom Line">
-              </div>
+          <div class="field-row">
+            <div class="field">
+              <label>Stat 2 — Number/Value</label>
+              <input type="text" id="ab-s2n" placeholder="3" oninput="markDirty('about')">
+            </div>
+            <div class="field">
+              <label>Stat 2 — Label</label>
+              <input type="text" id="ab-s2l" placeholder="Continents of project work" oninput="markDirty('about')">
             </div>
           </div>
         </div>
       </div>
 
-      <!-- ABOUT -->
-      <div class="panel" id="panel-about">
-        <div class="card">
-          <div class="card-head"><div class="card-title">Headline</div></div>
-          <div class="card-body">
-            <div class="field">
-              <label>Main heading (line 1)</label>
-              <input type="text" id="ab-h1" placeholder="We transform complexity">
-            </div>
-            <div class="field">
-              <label>Main heading (line 2 — green)</label>
-              <input type="text" id="ab-h2" placeholder="into better decisions.">
-            </div>
+      <div class="card">
+        <div class="card-head"><div><div class="card-title">Statement Section</div><div class="card-desc">Two paragraphs on the left + a pull quote on the right</div></div></div>
+        <div class="card-body">
+          <div class="field">
+            <label>Paragraph 1</label>
+            <textarea id="ab-p1" rows="3" oninput="markDirty('about')"></textarea>
+          </div>
+          <div class="field">
+            <label>Paragraph 2</label>
+            <textarea id="ab-p2" rows="3" oninput="markDirty('about')"></textarea>
+          </div>
+          <div class="field">
+            <label>Pull Quote (right side — large text, last word turns green)</label>
+            <input type="text" id="ab-pull" placeholder="We begin with the question." oninput="markDirty('about')">
           </div>
         </div>
-        <div class="card">
-          <div class="card-head"><div class="card-title">Stats</div></div>
-          <div class="card-body">
-            <div class="field-row">
-              <div class="field">
-                <label>Stat 1 — Number</label>
-                <input type="text" id="ab-s1n" placeholder="7+">
-              </div>
-              <div class="field">
-                <label>Stat 1 — Label</label>
-                <input type="text" id="ab-s1l" placeholder="Years cross-sector experience">
-              </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div><div class="card-title">Founder Section</div><div class="card-desc">The "How it started" founder narrative below the stats</div></div></div>
+        <div class="card-body">
+          <div class="field-row">
+            <div class="field">
+              <label>Section eyebrow (small label above headline)</label>
+              <input type="text" id="ab-fw-ey" placeholder="How it started" oninput="markDirty('about')">
             </div>
-            <div class="field-row">
-              <div class="field">
-                <label>Stat 2 — Number</label>
-                <input type="text" id="ab-s2n" placeholder="3">
-              </div>
-              <div class="field">
-                <label>Stat 2 — Label</label>
-                <input type="text" id="ab-s2l" placeholder="Continents of project work">
-              </div>
+            <div class="field">
+              <label>Section Headline</label>
+              <input type="text" id="ab-fw-h" placeholder="One founder, one conviction." oninput="markDirty('about')">
             </div>
           </div>
-        </div>
-        <div class="card">
-          <div class="card-head"><div class="card-title">Statement Section</div></div>
-          <div class="card-body">
-            <div class="field">
-              <label>Paragraph 1</label>
-              <textarea id="ab-p1"></textarea>
-            </div>
-            <div class="field">
-              <label>Paragraph 2</label>
-              <textarea id="ab-p2"></textarea>
-            </div>
-            <div class="field">
-              <label>Pull quote (right side)</label>
-              <input type="text" id="ab-pull" placeholder="We begin with the question.">
-            </div>
+          <div class="field">
+            <label>Paragraph 1</label>
+            <textarea id="ab-fw-p1" rows="3" oninput="markDirty('about')"></textarea>
           </div>
-        </div>
-        <div class="card">
-          <div class="card-head"><div class="card-title">Founder Section</div></div>
-          <div class="card-body">
+          <div class="field">
+            <label>Paragraph 2</label>
+            <textarea id="ab-fw-p2" rows="3" oninput="markDirty('about')"></textarea>
+          </div>
+          <div class="field">
+            <label>Paragraph 3</label>
+            <textarea id="ab-fw-p3" rows="3" oninput="markDirty('about')"></textarea>
+          </div>
+          <div class="section-label">Founder Photos</div>
+          <div class="field-row">
             <div class="field">
-              <label>Section eyebrow</label>
-              <input type="text" id="ab-fw-ey" placeholder="How it started">
-            </div>
-            <div class="field">
-              <label>Section headline</label>
-              <input type="text" id="ab-fw-h" placeholder="One founder, one conviction.">
-            </div>
-            <div class="field">
-              <label>Paragraph 1</label>
-              <textarea id="ab-fw-p1"></textarea>
-            </div>
-            <div class="field">
-              <label>Paragraph 2</label>
-              <textarea id="ab-fw-p2"></textarea>
-            </div>
-            <div class="field">
-              <label>Paragraph 3</label>
-              <textarea id="ab-fw-p3"></textarea>
-            </div>
-            <div class="field">
-              <label>Founder Photo 1 (back card)</label>
-              <div class="img-upload" id="ab-img1-wrap">
-                <div class="img-upload-icon">🖼</div>
-                <div class="img-upload-text">Click to upload or drag & drop</div>
-                <div class="img-upload-hint">JPG, PNG — recommended 600×800px</div>
-                <input type="file" accept="image/*" onchange="handleImg(this,'ab-img1','ab-img1-prev')">
-                <img id="ab-img1-prev" class="img-preview">
+              <label>Photo 1 (back card — slightly rotated right)</label>
+              <div class="img-drop" id="abImg1Drop">
+                <input type="file" accept="image/jpeg,image/png,image/webp" onchange="handleImgDrop(this,'ab-img1','abImg1Prev','abImg1Drop','abImg1Clear')">
+                <div class="img-drop-icon">🖼</div>
+                <div class="img-drop-text">Click to upload</div>
+                <div class="img-drop-hint">JPG, PNG · Recommended: 600×800px</div>
+                <img id="abImg1Prev" class="img-preview">
               </div>
+              <button class="img-clear" id="abImg1Clear" onclick="clearImg('ab-img1','abImg1Prev','abImg1Drop','abImg1Clear')">Remove</button>
               <input type="hidden" id="ab-img1">
             </div>
             <div class="field">
-              <label>Founder Photo 2 (front card)</label>
-              <div class="img-upload">
-                <div class="img-upload-icon">🖼</div>
-                <div class="img-upload-text">Click to upload or drag & drop</div>
-                <div class="img-upload-hint">JPG, PNG — recommended 600×800px</div>
-                <input type="file" accept="image/*" onchange="handleImg(this,'ab-img2','ab-img2-prev')">
-                <img id="ab-img2-prev" class="img-preview">
+              <label>Photo 2 (front card — main photo)</label>
+              <div class="img-drop" id="abImg2Drop">
+                <input type="file" accept="image/jpeg,image/png,image/webp" onchange="handleImgDrop(this,'ab-img2','abImg2Prev','abImg2Drop','abImg2Clear')">
+                <div class="img-drop-icon">🖼</div>
+                <div class="img-drop-text">Click to upload</div>
+                <div class="img-drop-hint">JPG, PNG · Recommended: 600×800px</div>
+                <img id="abImg2Prev" class="img-preview">
               </div>
+              <button class="img-clear" id="abImg2Clear" onclick="clearImg('ab-img2','abImg2Prev','abImg2Drop','abImg2Clear')">Remove</button>
               <input type="hidden" id="ab-img2">
             </div>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- SERVICES -->
-      <div class="panel" id="panel-services">
-        <div class="svc-domain">
-          <div class="svc-domain-head">Domain 1 — Europe</div>
-          <div class="svc-domain-body">
-            <div class="field">
-              <label>Domain name</label>
-              <input type="text" id="sv-d1-name" placeholder="Europe">
-            </div>
-            <div class="field">
-              <label>Sub-paragraph</label>
-              <textarea id="sv-d1-sub"></textarea>
-            </div>
-            <div id="sv-d1-discs"></div>
+    <!-- ─── SERVICES ─── -->
+    <div class="panel" id="panel-services">
+      <div class="card">
+        <div class="card-head"><div><div class="card-title">Europe Domain</div><div class="card-desc">Left side of the services section</div></div></div>
+        <div class="card-body">
+          <div class="field">
+            <label>Domain Label (large heading)</label>
+            <input type="text" id="sv-d1-name" placeholder="Europe" oninput="markDirty('services')">
           </div>
-        </div>
-        <div class="svc-domain">
-          <div class="svc-domain-head">Domain 2 — Global South</div>
-          <div class="svc-domain-body">
-            <div class="field">
-              <label>Domain name</label>
-              <input type="text" id="sv-d2-name" placeholder="Global South">
-            </div>
-            <div class="field">
-              <label>Sub-paragraph</label>
-              <textarea id="sv-d2-sub"></textarea>
-            </div>
-            <div id="sv-d2-discs"></div>
+          <div class="field">
+            <label>Description paragraph (shown on hover)</label>
+            <textarea id="sv-d1-sub" rows="2" oninput="markDirty('services')"></textarea>
           </div>
-        </div>
-        <div class="card">
-          <div class="card-body">
-            <div class="field">
-              <label>Convergence line text</label>
-              <input type="text" id="sv-converge" placeholder="Both converge into one capability — NUMICS.">
-            </div>
-          </div>
+          <div class="section-label">Disciplines (3 service areas)</div>
+          <div id="sv-d1-discs"></div>
         </div>
       </div>
 
-      <!-- BLOG -->
-      <div class="panel" id="panel-blog">
-        <div style="display:flex;justify-content:flex-end;margin-bottom:16px">
-          <button class="btn btn-primary" onclick="openEditor(-1)">+ Add New Post</button>
-        </div>
-        <div class="card">
-          <div class="card-head"><div class="card-title">All Posts</div></div>
-          <div class="post-list" id="post-list"></div>
+      <div class="card">
+        <div class="card-head"><div><div class="card-title">Global South Domain</div><div class="card-desc">Right side of the services section</div></div></div>
+        <div class="card-body">
+          <div class="field">
+            <label>Domain Label (large heading)</label>
+            <input type="text" id="sv-d2-name" placeholder="Global South" oninput="markDirty('services')">
+          </div>
+          <div class="field">
+            <label>Description paragraph (shown on hover)</label>
+            <textarea id="sv-d2-sub" rows="2" oninput="markDirty('services')"></textarea>
+          </div>
+          <div class="section-label">Disciplines (3 service areas)</div>
+          <div id="sv-d2-discs"></div>
         </div>
       </div>
 
-      <!-- CONTACT -->
-      <div class="panel" id="panel-contact">
-        <div class="card">
-          <div class="card-head"><div class="card-title">Contact Section</div></div>
-          <div class="card-body">
-            <div class="field">
-              <label>Headline</label>
-              <input type="text" id="ct-h" placeholder="Ready to begin with the right question?">
-            </div>
-            <div class="field">
-              <label>Sub-line</label>
-              <input type="text" id="ct-sub" placeholder="Every engagement starts with a 30-minute conversation.">
-            </div>
+      <div class="card">
+        <div class="card-head"><div><div class="card-title">Convergence Line</div><div class="card-desc">Appears below the two domains</div></div></div>
+        <div class="card-body">
+          <div class="field">
+            <input type="text" id="sv-converge" placeholder="Both converge into one capability — NUMICS." oninput="markDirty('services')">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── CONTACT ─── -->
+    <div class="panel" id="panel-contact">
+      <div class="card">
+        <div class="card-head"><div><div class="card-title">Contact Section</div></div></div>
+        <div class="card-body">
+          <div class="field">
+            <label>Eyebrow label (small text above headline)</label>
+            <input type="text" id="ct-eyebrow" placeholder="Contact" oninput="markDirty('contact')">
+          </div>
+          <div class="field">
+            <label>Headline (the "Ready to begin..." text)</label>
+            <input type="text" id="ct-h" placeholder="Ready to begin with the right question?" oninput="markDirty('contact')">
+            <div class="field-hint">The last word automatically turns green on the site</div>
+          </div>
+          <div class="field">
+            <label>Sub-line</label>
+            <input type="text" id="ct-sub" placeholder="Every engagement starts with a 30-minute conversation." oninput="markDirty('contact')">
+          </div>
+          <div class="field-row">
             <div class="field">
               <label>CTA Button Text</label>
-              <input type="text" id="ct-btn" placeholder="Request a Conversation">
+              <input type="text" id="ct-btn" placeholder="Request a Conversation" oninput="markDirty('contact')">
             </div>
             <div class="field">
-              <label>CTA Button Link (Cal.com URL)</label>
-              <input type="text" id="ct-link" placeholder="https://cal.com/your-link">
-            </div>
-            <div class="field-row">
-              <div class="field">
-                <label>Email address</label>
-                <input type="text" id="ct-email" placeholder="hello@numics.de">
-              </div>
-              <div class="field">
-                <label>LinkedIn URL</label>
-                <input type="text" id="ct-li" placeholder="https://linkedin.com/company/numics">
-              </div>
-            </div>
-            <div class="field">
-              <label>Location</label>
-              <input type="text" id="ct-loc" placeholder="Ruhr Region, Germany">
-            </div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-head"><div class="card-title">Footer</div></div>
-          <div class="card-body">
-            <div class="field">
-              <label>Copyright text</label>
-              <input type="text" id="ct-copy" placeholder="© 2025 NUMICS. All rights reserved.">
+              <label>CTA Button Link</label>
+              <input type="text" id="ct-link" placeholder="https://cal.com/your-link or mailto:" oninput="markDirty('contact')">
             </div>
           </div>
         </div>
       </div>
 
-    </div><!-- end content -->
-  </main>
-</div>
-</div><!-- end app -->
+      <div class="card">
+        <div class="card-head"><div><div class="card-title">Contact Details</div></div></div>
+        <div class="card-body">
+          <div class="field-row">
+            <div class="field">
+              <label>Email Address</label>
+              <input type="email" id="ct-email" placeholder="hello@numics.org" oninput="markDirty('contact')">
+            </div>
+            <div class="field">
+              <label>LinkedIn URL</label>
+              <input type="url" id="ct-li" placeholder="https://linkedin.com/in/yourprofile" oninput="markDirty('contact')">
+            </div>
+          </div>
+          <div class="field">
+            <label>Location</label>
+            <input type="text" id="ct-loc" placeholder="Ruhr Region, Germany" oninput="markDirty('contact')">
+          </div>
+        </div>
+      </div>
 
-<!-- BLOG EDITOR OVERLAY -->
-<div class="editor-overlay" id="editorOverlay">
-  <div class="editor-box">
-    <div class="editor-head">
-      <div class="editor-head-title" id="editorTitle">New Post</div>
-      <button class="editor-close" onclick="closeEditor()">✕</button>
+      <div class="card">
+        <div class="card-head"><div><div class="card-title">Footer</div></div></div>
+        <div class="card-body">
+          <div class="field">
+            <label>Copyright Text</label>
+            <input type="text" id="ct-copy" placeholder="2025 NUMICS. All rights reserved." oninput="markDirty('contact')">
+            <div class="field-hint">The © symbol is added automatically</div>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="art-editor-tabs">
-      <div class="art-tab active" onclick="switchTab(this,'tab-meta')">① Details</div>
-      <div class="art-tab" onclick="switchTab(this,'tab-content')">② Write Article</div>
+
+    <!-- ─── BLOG ─── -->
+    <div class="panel" id="panel-blog">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div>
+          <div style="font-size:16px;font-weight:700;letter-spacing:-.01em">Blog / Insights</div>
+          <div style="font-size:12px;color:var(--dim);margin-top:2px" id="postCountLabel">No posts yet</div>
+        </div>
+        <button class="btn btn-primary" onclick="openEditor(null)">+ New Article</button>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div class="card-title">All Articles</div></div>
+        <div id="post-list-container">
+          <div class="empty-state">
+            <div class="empty-state-icon">✦</div>
+            <div class="empty-state-text">No articles yet</div>
+            <div class="empty-state-sub">Click "+ New Article" to write your first insight</div>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="editor-body">
+
+    <!-- ─── SETTINGS ─── -->
+    <div class="panel" id="panel-settings">
+      <div class="card">
+        <div class="card-head"><div><div class="card-title">GitHub Integration</div><div class="card-desc">Required for publishing content to the live site</div></div></div>
+        <div class="card-body">
+          <div class="alert alert-yellow" id="tokenAlert" style="display:none">
+            <strong>No token set.</strong> You need a GitHub Personal Access Token to publish content live. Follow the steps below.
+          </div>
+          <div class="alert alert-green" id="tokenOkAlert" style="display:none">
+            <strong>Token saved.</strong> You can publish content to the live site.
+          </div>
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-label">GitHub Repository</div>
+              <div class="setting-desc">numics01 / NUMICS · branch: main</div>
+            </div>
+            <a href="https://github.com/numics01/NUMICS" target="_blank" class="btn btn-ghost btn-sm">View Repo ↗</a>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-label">Personal Access Token</div>
+              <div class="setting-desc" id="tokenStatusDesc">Required for publish. Classic token, "repo" scope, no expiry.</div>
+            </div>
+            <button class="btn btn-secondary btn-sm" onclick="openTokenModal()">Manage Token</button>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-label">Create a new token</div>
+              <div class="setting-desc">Opens GitHub → Settings → Developer Settings → Personal access tokens (classic)</div>
+            </div>
+            <a href="https://github.com/settings/tokens/new?scopes=repo&description=NUMICS+CMS" target="_blank" class="btn btn-ghost btn-sm">Create Token ↗</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div><div class="card-title">CMS Password</div><div class="card-desc">Password to access this admin panel</div></div></div>
+        <div class="card-body">
+          <div class="field">
+            <label>New Password</label>
+            <input type="password" id="new-pw-1" placeholder="Enter new password">
+          </div>
+          <div class="field">
+            <label>Confirm New Password</label>
+            <input type="password" id="new-pw-2" placeholder="Confirm new password">
+          </div>
+          <div class="field-hint warn" id="pw-change-msg"></div>
+          <div style="margin-top:10px">
+            <button class="btn btn-secondary btn-sm" onclick="changePassword()">Update Password</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div><div class="card-title">Data Management</div></div></div>
+        <div class="card-body">
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-label">Export Data</div>
+              <div class="setting-desc">Download numics-data.json — the raw content file</div>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="exportData()">Export JSON</button>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-label">Reload from GitHub</div>
+              <div class="setting-desc">Fetch the latest published version from GitHub</div>
+            </div>
+            <button class="btn btn-secondary btn-sm" onclick="reloadFromGitHub()">Reload Now</button>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-label">Clear Local Draft</div>
+              <div class="setting-desc">Remove the locally saved draft from this browser (no effect on live site)</div>
+            </div>
+            <button class="btn btn-danger btn-sm" onclick="clearLocalDraft()">Clear Draft</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</main>
+</div>
+</div><!-- /app -->
+
+<!-- ══════════════════════════════════════════
+     ARTICLE EDITOR MODAL
+══════════════════════════════════════════ -->
+<div class="overlay" id="editorOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="editorTitle">New Article</div>
+      <button class="modal-close" onclick="closeEditor()">✕</button>
+    </div>
+    <div class="modal-tabs">
+      <div class="modal-tab active" onclick="switchEdTab(this,'ed-tab-meta')">① Details &amp; Meta</div>
+      <div class="modal-tab" onclick="switchEdTab(this,'ed-tab-cover')">② Cover Image</div>
+      <div class="modal-tab" onclick="switchEdTab(this,'ed-tab-content')">③ Article Content</div>
+    </div>
+    <div class="modal-body">
 
       <!-- TAB 1: META -->
-      <div class="art-tab-panel active" id="tab-meta">
+      <div class="modal-tab-panel active" id="ed-tab-meta">
         <div class="field">
-          <label>Article Title</label>
-          <input type="text" id="ed-title" placeholder="Enter your article title here">
+          <label>Article Title *</label>
+          <input type="text" id="ed-title" placeholder="Enter a clear, descriptive title...">
         </div>
         <div class="field-row">
           <div class="field">
             <label>Category</label>
             <select id="ed-cat">
-              <option>Regulatory Analysis</option>
-              <option>Climate Finance</option>
-              <option>Strategic Intelligence</option>
-              <option>Supply Chain</option>
-              <option>Research</option>
+              <option value="Regulatory Analysis">Regulatory Analysis</option>
+              <option value="Climate Finance">Climate Finance</option>
+              <option value="Strategic Intelligence">Strategic Intelligence</option>
+              <option value="Supply Chain">Supply Chain</option>
+              <option value="Research">Research</option>
+              <option value="ESG Advisory">ESG Advisory</option>
+              <option value="Sustainable Finance">Sustainable Finance</option>
+              <option value="Global South">Global South</option>
+              <option value="Market Intelligence">Market Intelligence</option>
             </select>
           </div>
           <div class="field">
-            <label>Date</label>
-            <input type="text" id="ed-date" placeholder="June 2026">
+            <label>Publication Date</label>
+            <input type="text" id="ed-date" placeholder="e.g. September 2026">
           </div>
         </div>
         <div class="field-row">
           <div class="field">
-            <label>Read time</label>
-            <input type="text" id="ed-time" placeholder="7 min">
+            <label>Read Time</label>
+            <input type="text" id="ed-time" placeholder="e.g. 8 min read">
           </div>
           <div class="field">
-            <label>Article filename</label>
+            <label>Article URL / Filename</label>
             <input type="text" id="ed-url" placeholder="articles/my-article.html">
-            <div class="field-hint">e.g. articles/csrd-2026.html</div>
+            <div class="field-hint">e.g. articles/csrd-2026.html — this links the card to the article page</div>
           </div>
         </div>
         <div class="field">
-          <label>Short excerpt (shown on homepage card)</label>
-          <textarea id="ed-excerpt" style="min-height:56px" placeholder="One or two sentences about this article. Shown on the blog card on the homepage."></textarea>
+          <label>Excerpt (shown on the homepage card — 1–2 sentences) *</label>
+          <textarea id="ed-excerpt" rows="3" placeholder="A concise summary shown on the insights card on the homepage. Keep it to 1-2 sentences."></textarea>
         </div>
         <div class="field">
-          <label>Cover Image</label>
-          <div class="img-upload">
-            <div class="img-upload-icon">🖼</div>
-            <div class="img-upload-text">Click to upload or drag & drop</div>
-            <div class="img-upload-hint">JPG, PNG — recommended 800×600px</div>
-            <input type="file" accept="image/*" onchange="handleImg(this,'ed-img','ed-img-prev')">
-            <img id="ed-img-prev" class="img-preview">
+          <label>SEO Meta Description (optional)</label>
+          <textarea id="ed-seo" rows="2" placeholder="Search engine description (max ~160 characters). Leave blank to use excerpt."></textarea>
+          <div class="field-hint">Shown in Google search results. Max 160 characters.</div>
+        </div>
+        <div class="field">
+          <label>Tags (comma-separated)</label>
+          <input type="text" id="ed-tags" placeholder="CSRD, EU Taxonomy, ESG reporting">
+          <div class="field-hint">Helps with filtering. Not currently shown on the site.</div>
+        </div>
+      </div>
+
+      <!-- TAB 2: COVER IMAGE -->
+      <div class="modal-tab-panel" id="ed-tab-cover">
+        <div class="alert alert-blue" style="margin-bottom:16px">
+          <strong>Cover image</strong> is shown on the homepage insights card and at the top of the article. For best results use 1200×800px or similar landscape format.
+        </div>
+        <div class="field">
+          <div class="img-drop" id="edCoverDrop" style="padding:32px">
+            <input type="file" accept="image/jpeg,image/png,image/webp" onchange="handleImgDrop(this,'ed-img','edCoverPrev','edCoverDrop','edCoverClear')">
+            <div class="img-drop-icon" style="font-size:32px">🖼</div>
+            <div class="img-drop-text">Click or drag to upload cover image</div>
+            <div class="img-drop-hint">JPG, PNG, WebP · Recommended: 1200×800px · Max 4MB</div>
+            <img id="edCoverPrev" class="img-preview" style="max-height:240px">
           </div>
+          <button class="img-clear" id="edCoverClear" onclick="clearImg('ed-img','edCoverPrev','edCoverDrop','edCoverClear')">Remove cover image</button>
           <input type="hidden" id="ed-img">
         </div>
+        <div class="field" style="margin-top:12px">
+          <label>Alt text (accessibility)</label>
+          <input type="text" id="ed-img-alt" placeholder="Describe the image...">
+        </div>
       </div>
 
-      <!-- TAB 2: RICH TEXT EDITOR -->
-      <div class="art-tab-panel" id="tab-content">
-
-        <!-- Toolbar -->
-        <div style="margin-bottom:8px">
-          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
-            <button class="rte-btn" onclick="rteWrap('**','**')" title="Bold"><b>B</b></button>
-            <button class="rte-btn" onclick="rteWrap('*','*')" title="Italic"><i>I</i></button>
-            <button class="rte-btn" onclick="rteWrap('## ','')" title="Heading">H</button>
-            <button class="rte-btn" onclick="rteWrap('- ','')" title="Bullet">•</button>
+      <!-- TAB 3: RICH TEXT EDITOR -->
+      <div class="modal-tab-panel" id="ed-tab-content">
+        <div class="rte-wrap">
+          <!-- TOOLBAR -->
+          <div class="rte-toolbar">
+            <!-- Format block -->
+            <select class="rte-select" onchange="execCmd('formatBlock',this.value);this.value=''" title="Text style">
+              <option value="">Paragraph</option>
+              <option value="h2">Heading 2</option>
+              <option value="h3">Heading 3</option>
+              <option value="h4">Heading 4</option>
+              <option value="blockquote">Blockquote</option>
+              <option value="pre">Code Block</option>
+            </select>
+            <!-- Font size -->
+            <select class="rte-select" onchange="execCmd('fontSize',this.value);this.value=''" title="Font size">
+              <option value="">Size</option>
+              <option value="2">Small</option>
+              <option value="3">Normal</option>
+              <option value="4">Large</option>
+              <option value="5">X-Large</option>
+            </select>
+            <div class="rte-sep"></div>
+            <button class="rte-btn" onclick="execCmd('bold')" title="Bold"><b>B</b></button>
+            <button class="rte-btn" onclick="execCmd('italic')" title="Italic"><i>I</i></button>
+            <button class="rte-btn" onclick="execCmd('underline')" title="Underline"><u>U</u></button>
+            <button class="rte-btn" onclick="execCmd('strikeThrough')" title="Strikethrough"><s>S</s></button>
+            <div class="rte-sep"></div>
+            <div class="rte-color-btn" title="Text color">
+              A <input type="color" value="#111111" onchange="execCmd('foreColor',this.value)">
+            </div>
+            <div class="rte-color-btn" title="Highlight color">
+              H <input type="color" value="#FEF08A" onchange="execCmd('hiliteColor',this.value)">
+            </div>
+            <div class="rte-sep"></div>
+            <button class="rte-btn" onclick="execCmd('justifyLeft')" title="Left">&#8676;</button>
+            <button class="rte-btn" onclick="execCmd('justifyCenter')" title="Center">&#8596;</button>
+            <button class="rte-btn" onclick="execCmd('justifyRight')" title="Right">&#8677;</button>
+            <div class="rte-sep"></div>
+            <button class="rte-btn" onclick="execCmd('insertUnorderedList')" title="Bullet list">• list</button>
+            <button class="rte-btn" onclick="execCmd('insertOrderedList')" title="Numbered">1. list</button>
+            <button class="rte-btn" onclick="execCmd('outdent')" title="Outdent">&#8676;</button>
+            <button class="rte-btn" onclick="execCmd('indent')" title="Indent">&#8677;</button>
+            <div class="rte-sep"></div>
+            <button class="rte-btn" onclick="insertRteLink()" title="Link">Link</button>
+            <button class="rte-btn" onclick="document.getElementById('rte-file-input').click()" title="Image">Img</button>
+            <input type="file" id="rte-file-input" accept="image/*" style="display:none" onchange="insertRteImage(this)">
+            <button class="rte-btn" onclick="execCmd('insertHorizontalRule')" title="Divider">&#8213;</button>
+            <div class="rte-sep"></div>
+            <button class="rte-btn" onclick="execCmd('undo')" title="Undo">Undo</button>
+            <button class="rte-btn" onclick="execCmd('redo')" title="Redo">Redo</button>
+            <button class="rte-btn" onclick="execCmd('removeFormat')" style="color:var(--danger)" title="Clear formatting">Clear</button>
           </div>
-          <textarea id="ed-rte" style="width:100%;min-height:280px;border:1.5px solid #E5E7EB;border-radius:6px;padding:14px;font-size:14px;line-height:1.7;font-family:inherit;resize:vertical;outline:none" placeholder="Write your article content here..."></textarea>
-        </div
-
-        <!-- Hidden storage -->
-        <textarea id="ed-body" style="display:none"></textarea>
-
+          <!-- EDITABLE AREA -->
+          <div id="rte" contenteditable="true" class="rte-area"
+            data-placeholder="Start writing your article here. Use the toolbar above for formatting...">
+          </div>
+          <div class="rte-char-count" id="rteCharCount">0 words · 0 characters</div>
+        </div>
+        <div class="field-hint" style="margin-top:8px">Tip: Paste text directly from Word or Google Docs — formatting is preserved. Use Heading 2 for main section headers, Heading 3 for sub-sections.</div>
       </div>
 
-    </div>
-    <div class="editor-foot">
-      <button class="btn btn-danger" id="edDelBtn" onclick="deletePost()">Delete</button>
-      <button class="btn btn-secondary" onclick="closeEditor()">Cancel</button>
-      <button class="btn btn-primary" onclick="savePost()">Save Post</button>
+    </div><!-- /modal-body -->
+    <div class="modal-foot">
+      <button class="btn btn-danger btn-sm" id="edDelBtn" onclick="deletePost()" style="display:none;margin-right:auto">Delete Article</button>
+      <button class="btn btn-secondary btn-sm" onclick="closeEditor()">Cancel</button>
+      <button class="btn btn-primary btn-sm" onclick="savePost()">Save Article</button>
     </div>
   </div>
 </div>
 
+<!-- ══════════════════════════════════════════
+     TOKEN MODAL
+══════════════════════════════════════════ -->
+<div class="overlay" id="tokenOverlay">
+  <div class="token-modal">
+    <div class="modal-head">
+      <div class="modal-title">GitHub Token Settings</div>
+      <button class="modal-close" onclick="closeTokenModal()">✕</button>
+    </div>
+    <div style="padding:20px;display:flex;flex-direction:column;gap:14px">
+      <div class="alert alert-blue">
+        <strong>What is this?</strong> A GitHub Personal Access Token lets this admin panel write content to your GitHub repo, which triggers an automatic site rebuild.<br><br>
+        Token is stored in your <strong>browser only</strong> (localStorage) — never sent anywhere except directly to GitHub's API.
+      </div>
+      <div class="field">
+        <label>Personal Access Token (Classic — repo scope)</label>
+        <input type="password" id="gh-token-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
+        <div class="field-hint" id="tokenSavedMsg"></div>
+      </div>
+      <div class="field">
+        <label>Verify token (optional)</label>
+        <button class="btn btn-ghost btn-sm" onclick="verifyToken()" style="align-self:flex-start">Test Connection</button>
+        <div class="field-hint" id="tokenVerifyMsg"></div>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <a href="https://github.com/settings/tokens/new?scopes=repo&description=NUMICS+CMS" target="_blank" class="btn btn-ghost btn-sm">Create Token ↗</a>
+        <button class="btn btn-secondary btn-sm" onclick="closeTokenModal()">Cancel</button>
+        <button class="btn btn-primary btn-sm" onclick="saveToken()">Save Token</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- TOAST -->
 <div class="toast" id="toast">
-  <div class="toast-dot"></div>
-  <span id="toastMsg">Saved</span>
+  <div class="toast-dot green" id="toastDot"></div>
+  <span id="toastMsg">Saved.</span>
 </div>
 
 <script>
+/* ══════════════════════════════════════════════════════════════
+   NUMICS CMS v3.0 — Complete Admin Panel
+   Architecture: Single-file SPA. Data stored in numics-data.json
+   on GitHub (public repo). Admin fetches latest on load, edits in
+   memory, saves to localStorage as draft, publishes via GitHub API.
+══════════════════════════════════════════════════════════════ */
 
-var PASSWORD  = "numics2025";
-var GH_USER   = "numics01";
-var GH_REPO   = "NUMICS";
-var GH_BRANCH = "main";
-var DATA_FILE = "numics-data.json";
+var CFG = {
+  password: "numics2025",
+  ghUser: "numics01",
+  ghRepo: "NUMICS",
+  ghBranch: "main",
+  dataFile: "numics-data.json",
+  siteUrl: "https://numics.org"
+};
 
-function doLogin(){
+/* ── DEFAULT DATA STRUCTURE ── */
+var DATA = {
+  hero: {
+    pre: "Sustainability is a",
+    tag: "We are the architects.",
+    cta: "Request a Consultation",
+    link: "",
+    navcta: "Request Consultation",
+    video: "",
+    videoOpacity: "0.55",
+    bgImg: "",
+    logo: ""
+  },
+  kinetic: {
+    stmts: [
+      {l:"Regulation",r:"Revenue"},
+      {l:"Data",r:"Decisions"},
+      {l:"Efficiency",r:"Growth"},
+      {l:"Sustainability",r:"Profit"},
+      {l:"Risk",r:"Opportunity"},
+      {l:"Complexity",r:"Action"}
+    ],
+    finalTop: "Where all of it meets",
+    finalBot: "The Bottom Line"
+  },
+  about: {
+    h1: "We transform complexity",
+    h2: "into better decisions.",
+    s1n: "7+", s1l: "Years cross-sector experience",
+    s2n: "3", s2l: "Continents of project work",
+    p1: "NUMICS is a founder-led strategic intelligence firm based in the Ruhr Region, Germany. We work at the intersection of EU sustainability regulation, climate finance, data and emerging market project development.",
+    p2: "We do not begin with a predefined answer. We investigate, challenge assumptions, and turn evidence into decisions that move organisations forward.",
+    pull: "We begin with the question.",
+    fwEy: "How it started",
+    fwH: "One founder, one conviction.",
+    fwP1: "Waqar Ahmed has always been driven by one question: how can technical expertise and strategic intelligence solve problems that actually matter?",
+    fwP2: "The sustainability transition is the defining business challenge of this decade. Most firms treat it as a compliance problem. Waqar saw it as a decision problem.",
+    fwP3: "NUMICS is built around a specific accumulation of expertise: regulatory depth, quantitative rigour, global project experience and AI-augmented intelligence, delivered directly.",
+    img1: "", img2: ""
+  },
+  services: {
+    d1Name: "Europe",
+    d1Sub: "EU regulatory depth — from Taxonomy to CSDDD — translated into decisions that move organisations forward.",
+    d1Discs: [
+      {name:"Sustainable Finance & ESG", tags:"EU Taxonomy · CSRD · SFDR · PAIs · PCAF"},
+      {name:"Climate & Sustainability Strategy", tags:"SBTi · TCFD · GHG Protocol · TNFD · VSME"},
+      {name:"Human Rights & Supply Chain", tags:"LkSG · CSDDD · EUDR · OECD · ILO"}
+    ],
+    d2Name: "Global South",
+    d2Sub: "On-the-ground intelligence across Africa, South Asia and beyond — where European capital meets emerging market reality.",
+    d2Discs: [
+      {name:"Project Development & Feasibility", tags:"Climate Finance · Feasibility Studies · Investment Readiness"},
+      {name:"Renewable Energy & Waste", tags:"Biogas · Solar · Circular Economy · Waste Management"},
+      {name:"Research & Market Intelligence", tags:"Market Research · Socio-economic Analysis · Development Finance"}
+    ],
+    converge: "Both converge into one capability — NUMICS."
+  },
+  contact: {
+    eyebrow: "Contact",
+    h: "Ready to begin with the right question?",
+    sub: "Every engagement starts with a 30-minute conversation.",
+    btn: "Request a Conversation",
+    link: "",
+    email: "hello@numics.org",
+    li: "https://linkedin.com/in/",
+    loc: "Ruhr Region, Germany",
+    copy: "2026 NUMICS. All rights reserved."
+  },
+  posts: []
+};
+
+/* ── STATE ── */
+var currentPost = null;
+var dirtyPanels = {};
+var lastPublished = null;
+
+/* ══════════════════════════════════════════
+   AUTH
+══════════════════════════════════════════ */
+function doLogin() {
   var pw = document.getElementById("pwInput").value;
-  if(pw === PASSWORD){
+  var storedPw = localStorage.getItem("numics_pw") || CFG.password;
+  var err = document.getElementById("loginErr");
+  if (pw === storedPw) {
     document.getElementById("login").style.display = "none";
     document.getElementById("app").style.display = "block";
-    loadAll();
-    toast("Welcome back.");
+    init();
   } else {
-    document.getElementById("loginErr").style.display = "block";
+    err.textContent = "Incorrect password. Try again.";
     document.getElementById("pwInput").value = "";
   }
 }
 
-var panels = ["dashboard","hero","kinetic","about","services","blog","contact"];
-function showPanel(id){
-  panels.forEach(function(p){
-    document.getElementById("panel-"+p).classList.toggle("active", p===id);
-  });
-  document.querySelectorAll(".nav-item").forEach(function(n){
-    n.classList.toggle("active", n.dataset.panel===id);
-  });
-  document.getElementById("topbarTitle").textContent = id.charAt(0).toUpperCase()+id.slice(1);
-  if(id==="blog") renderPosts();
-}
-
-var DATA = {
-  hero:{pre:"Sustainability is a",tag:"We are the architects.",cta:"Request a Consultation",link:"",video:"",videoOpacity:"0.55",bgImg:"",logo:""},
-  kinetic:{
-    stmts:[{l:"Regulation",r:"Revenue"},{l:"Data",r:"Decisions"},{l:"Efficiency",r:"Growth"},{l:"Sustainability",r:"Profit"},{l:"Risk",r:"Opportunity"},{l:"Complexity",r:"Action"}],
-    finalTop:"Where all of it meets",finalBot:"The Bottom Line"
-  },
-  about:{
-    h1:"We transform complexity",h2:"into better decisions.",
-    s1n:"7+",s1l:"Years cross-sector experience",
-    s2n:"3",s2l:"Continents of project work",
-    p1:"NUMICS is a founder-led strategic intelligence firm based in the Ruhr Region, Germany.",
-    p2:"We do not begin with a predefined answer. We investigate, challenge assumptions, and turn evidence into decisions.",
-    pull:"We begin with the question.",
-    fwEy:"How it started",fwH:"One founder, one conviction.",
-    fwP1:"Waqar Ahmed has always been driven by one question: how can technical expertise and strategic intelligence solve problems that actually matter?",
-    fwP2:"The sustainability transition is the defining business challenge of this decade.",
-    fwP3:"NUMICS is built around a specific accumulation of expertise: regulatory depth, quantitative rigour, global project experience and AI-augmented intelligence.",
-    img1:"",img2:""
-  },
-  services:{
-    d1Name:"Europe",
-    d1Sub:"EU regulatory depth - from Taxonomy to CSDDD - translated into decisions that move organisations forward.",
-    d1Discs:[
-      {name:"Sustainable Finance and ESG",tags:"EU Taxonomy, CSRD, SFDR, PAIs, PCAF"},
-      {name:"Climate and Sustainability Strategy",tags:"SBTi, TCFD, GHG Protocol, TNFD, VSME"},
-      {name:"Human Rights and Supply Chain",tags:"LkSG, CSDDD, EUDR, OECD, ILO"}
-    ],
-    d2Name:"Global South",
-    d2Sub:"On-the-ground intelligence across Africa, South Asia and beyond.",
-    d2Discs:[
-      {name:"Project Development and Feasibility",tags:"Climate Finance, Feasibility Studies, Investment Readiness"},
-      {name:"Renewable Energy and Waste",tags:"Biogas, Solar, Circular Economy, Waste Management"},
-      {name:"Research and Market Intelligence",tags:"Market Research, Socio-economic Analysis, Development Finance"}
-    ],
-    converge:"Both converge into one capability - NUMICS."
-  },
-  contact:{
-    h:"Ready to begin with the right question?",
-    sub:"Every engagement starts with a 30-minute conversation.",
-    btn:"Request a Conversation",link:"",email:"hello@numics.de",
-    li:"https://linkedin.com/company/numics",
-    loc:"Ruhr Region, Germany",copy:"2025 NUMICS. All rights reserved."
-  },
-  posts:[]
-};
-
-function loadAll(){
-  var saved = localStorage.getItem("numics_admin");
-  if(saved){ try{ Object.assign(DATA, JSON.parse(saved)); }catch(e){} }
-  var token = getToken();
-  if(token){
-    fetch("https://api.github.com/repos/"+GH_USER+"/"+GH_REPO+"/contents/"+DATA_FILE,
-      {headers:{Authorization:"token "+token,Accept:"application/vnd.github.v3+json"}})
-    .then(function(r){ return r.json(); })
-    .then(function(d){
-      if(d && d.content){
-        try{
-          var clean = d.content.split("\n").join("");
-          var json = JSON.parse(decodeURIComponent(escape(atob(clean))));
-          Object.assign(DATA, json);
-          toast("Data loaded from GitHub.");
-        }catch(e){}
-      }
-      populateFields();
-    })
-    .catch(function(){ populateFields(); });
-  } else {
-    populateFields();
-  }
-}
-
-function populateFields(){
-  sv("h-pre",DATA.hero.pre); sv("h-tag",DATA.hero.tag); sv("h-cta",DATA.hero.cta);
-  sv("h-link",DATA.hero.link); sv("h-video",DATA.hero.video||"");
-  buildKtList();
-  sv("kt-final-top",DATA.kinetic.finalTop); sv("kt-final-bot",DATA.kinetic.finalBot);
-  sv("ab-h1",DATA.about.h1); sv("ab-h2",DATA.about.h2);
-  sv("ab-s1n",DATA.about.s1n); sv("ab-s1l",DATA.about.s1l);
-  sv("ab-s2n",DATA.about.s2n); sv("ab-s2l",DATA.about.s2l);
-  sv("ab-p1",DATA.about.p1); sv("ab-p2",DATA.about.p2); sv("ab-pull",DATA.about.pull);
-  sv("ab-fw-ey",DATA.about.fwEy); sv("ab-fw-h",DATA.about.fwH);
-  sv("ab-fw-p1",DATA.about.fwP1); sv("ab-fw-p2",DATA.about.fwP2); sv("ab-fw-p3",DATA.about.fwP3);
-  sv("sv-d1-name",DATA.services.d1Name); sv("sv-d1-sub",DATA.services.d1Sub);
-  sv("sv-d2-name",DATA.services.d2Name); sv("sv-d2-sub",DATA.services.d2Sub);
-  sv("sv-converge",DATA.services.converge);
-  buildDiscList("sv-d1-discs",DATA.services.d1Discs,1);
-  buildDiscList("sv-d2-discs",DATA.services.d2Discs,2);
-  sv("ct-h",DATA.contact.h); sv("ct-sub",DATA.contact.sub); sv("ct-btn",DATA.contact.btn);
-  sv("ct-link",DATA.contact.link); sv("ct-email",DATA.contact.email);
-  sv("ct-li",DATA.contact.li); sv("ct-loc",DATA.contact.loc); sv("ct-copy",DATA.contact.copy);
-  var dsp = document.getElementById("ds-posts"); if(dsp) dsp.textContent = DATA.posts.length;
-  updateLastSaved();
-}
-
-function sv(id,val){ var el=document.getElementById(id); if(el) el.value=val||""; }
-function gv(id){ var el=document.getElementById(id); return el?el.value:""; }
-
-function buildKtList(){
-  var c=document.getElementById("kt-list"); if(!c) return;
-  c.innerHTML=DATA.kinetic.stmts.map(function(s,i){
-    return "<div class=\"kt-item\"><span class=\"kt-num\">0"+(i+1)+"</span>"
-      +"<input class=\"kt-input\" id=\"kt-l-"+i+"\" value=\""+s.l+"\" placeholder=\"Left\">"
-      +"<input class=\"kt-input\" id=\"kt-r-"+i+"\" value=\""+s.r+"\" placeholder=\"Right\"></div>";
-  }).join("");
-}
-
-function buildDiscList(cid,discs,d){
-  var c=document.getElementById(cid); if(!c) return;
-  c.innerHTML=discs.map(function(disc,i){
-    return "<div class=\"svc-disc-item\"><span class=\"kt-num\">0"+(i+1)+"</span>"
-      +"<input class=\"kt-input\" id=\"sv-d"+d+"-disc-"+i+"-name\" value=\""+disc.name+"\" placeholder=\"Name\">"
-      +"<input class=\"kt-input\" id=\"sv-d"+d+"-disc-"+i+"-tags\" value=\""+disc.tags+"\" placeholder=\"Tags\"></div>";
-  }).join("");
-}
-
-function collectData(){
-  DATA.hero.pre=gv("h-pre"); DATA.hero.tag=gv("h-tag"); DATA.hero.cta=gv("h-cta");
-  DATA.hero.link=gv("h-link"); DATA.hero.video=gv("h-video"); DATA.hero.bgImg=gv("h-bg-img");
-  DATA.kinetic.stmts.forEach(function(s,i){ s.l=gv("kt-l-"+i); s.r=gv("kt-r-"+i); });
-  DATA.kinetic.finalTop=gv("kt-final-top"); DATA.kinetic.finalBot=gv("kt-final-bot");
-  DATA.about.h1=gv("ab-h1"); DATA.about.h2=gv("ab-h2");
-  DATA.about.s1n=gv("ab-s1n"); DATA.about.s1l=gv("ab-s1l");
-  DATA.about.s2n=gv("ab-s2n"); DATA.about.s2l=gv("ab-s2l");
-  DATA.about.p1=gv("ab-p1"); DATA.about.p2=gv("ab-p2"); DATA.about.pull=gv("ab-pull");
-  DATA.about.fwEy=gv("ab-fw-ey"); DATA.about.fwH=gv("ab-fw-h");
-  DATA.about.fwP1=gv("ab-fw-p1"); DATA.about.fwP2=gv("ab-fw-p2"); DATA.about.fwP3=gv("ab-fw-p3");
-  DATA.services.d1Name=gv("sv-d1-name"); DATA.services.d1Sub=gv("sv-d1-sub");
-  DATA.services.d2Name=gv("sv-d2-name"); DATA.services.d2Sub=gv("sv-d2-sub");
-  DATA.services.converge=gv("sv-converge");
-  DATA.services.d1Discs.forEach(function(d,i){ d.name=gv("sv-d1-disc-"+i+"-name"); d.tags=gv("sv-d1-disc-"+i+"-tags"); });
-  DATA.services.d2Discs.forEach(function(d,i){ d.name=gv("sv-d2-disc-"+i+"-name"); d.tags=gv("sv-d2-disc-"+i+"-tags"); });
-  DATA.contact.h=gv("ct-h"); DATA.contact.sub=gv("ct-sub"); DATA.contact.btn=gv("ct-btn");
-  DATA.contact.link=gv("ct-link"); DATA.contact.email=gv("ct-email");
-  DATA.contact.li=gv("ct-li"); DATA.contact.loc=gv("ct-loc"); DATA.contact.copy=gv("ct-copy");
-}
-
-function switchTab(el, panelId){
-  document.querySelectorAll(".art-tab").forEach(function(t){ t.classList.remove("active"); });
-  document.querySelectorAll(".art-tab-panel").forEach(function(p){ p.classList.remove("active"); });
-  el.classList.add("active");
-  document.getElementById(panelId).classList.add("active");
-}
-
-function doLogout(){
+function doLogout() {
   document.getElementById("login").style.display = "flex";
   document.getElementById("app").style.display = "none";
+  document.getElementById("pwInput").value = "";
+  document.getElementById("loginErr").textContent = "";
 }
 
-function saveAll(){
-  collectData();
-  localStorage.setItem("numics_admin", JSON.stringify(DATA));
-  localStorage.setItem("numics_saved", new Date().toLocaleTimeString());
-  updateLastSaved();
-  toast("Saved. Click Publish Live to update website.");
+function changePassword() {
+  var p1 = document.getElementById("new-pw-1").value;
+  var p2 = document.getElementById("new-pw-2").value;
+  var msg = document.getElementById("pw-change-msg");
+  if (!p1) { msg.textContent = "Please enter a new password."; return; }
+  if (p1 !== p2) { msg.textContent = "Passwords do not match."; return; }
+  if (p1.length < 6) { msg.textContent = "Password must be at least 6 characters."; return; }
+  localStorage.setItem("numics_pw", p1);
+  msg.className = "field-hint ok";
+  msg.textContent = "Password updated. You will need to use it next time you sign in.";
+  document.getElementById("new-pw-1").value = "";
+  document.getElementById("new-pw-2").value = "";
+  toast("Password updated.", "green");
 }
 
-function updateLastSaved(){
-  var t=localStorage.getItem("numics_saved");
-  var el=document.getElementById("ds-saved"); if(el) el.textContent=t||"Never";
+/* ══════════════════════════════════════════
+   INIT
+══════════════════════════════════════════ */
+function init() {
+  updateTokenUI();
+  buildKtList();
+  buildDiscLists();
+  reloadFromGitHub();
 }
 
-async function publishToGitHub(){
-  var token = getToken();
-  if(!token){ openGHSettings(); return; }
-  collectData();
-  var btn=document.getElementById("publishBtn");
-  btn.textContent="Publishing..."; btn.disabled=true;
-  try{
-    toast("Saving content...");
-    var content=JSON.stringify(DATA,null,2);
-    var encoded=btoa(unescape(encodeURIComponent(content)));
-    var sha=null;
-    try{
-      var chk=await fetch("https://api.github.com/repos/"+GH_USER+"/"+GH_REPO+"/contents/"+DATA_FILE,
-        {headers:{Authorization:"token "+token,Accept:"application/vnd.github.v3+json"}});
-      if(chk.ok){ var cd=await chk.json(); sha=cd.sha; }
-    }catch(e){}
-    var body={message:"Update content",content:encoded,branch:GH_BRANCH};
-    if(sha) body.sha=sha;
-    var res=await fetch("https://api.github.com/repos/"+GH_USER+"/"+GH_REPO+"/contents/"+DATA_FILE,{
-      method:"PUT",
-      headers:{Authorization:"token "+token,Accept:"application/vnd.github.v3+json","Content-Type":"application/json"},
-      body:JSON.stringify(body)
-    });
-    if(!res.ok){ var er=await res.json(); throw new Error(er.message||"Write failed"); }
-    toast("Triggering redeploy...");
-    try{
-      var ir=await fetch("https://api.github.com/repos/"+GH_USER+"/"+GH_REPO+"/contents/index.html",
-        {headers:{Authorization:"token "+token,Accept:"application/vnd.github.v3+json"}});
-      if(ir.ok){
-        var id2=await ir.json();
-        var clean2=id2.content.split("\n").join("");
-        var ic=decodeURIComponent(escape(atob(clean2)));
-        var ts="<!-- ts:"+Date.now()+" -->";
-        var ic2=removeTS(ic)+ts;
-        var ie=btoa(unescape(encodeURIComponent(ic2)));
-        await fetch("https://api.github.com/repos/"+GH_USER+"/"+GH_REPO+"/contents/index.html",{
-          method:"PUT",
-          headers:{Authorization:"token "+token,Accept:"application/vnd.github.v3+json","Content-Type":"application/json"},
-          body:JSON.stringify({message:"Redeploy",content:ie,sha:id2.sha,branch:GH_BRANCH})
-        });
-      }
-    }catch(e){}
-    localStorage.setItem("numics_admin",JSON.stringify(DATA));
-    localStorage.setItem("numics_saved",new Date().toLocaleTimeString());
-    updateLastSaved();
-    btn.textContent="Live!"; btn.style.background="#22C55E";
-    setTimeout(function(){ btn.textContent="Publish Live"; btn.style.background=""; btn.disabled=false; },4000);
-    toast("Published! Site updates in ~60 seconds.");
-  }catch(e){
-    btn.textContent="Publish Live"; btn.style.background=""; btn.disabled=false;
-    alert("Publish failed: "+e.message);
+/* ══════════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════════ */
+var PANELS = ["dashboard","hero","kinetic","about","services","contact","blog","settings"];
+function goPanel(el) {
+  if (typeof el === "string") {
+    el = document.querySelector("[data-panel=" + el + "]");
+  }
+  var id = el ? el.dataset.panel : "dashboard";
+  PANELS.forEach(function(p) {
+    var panel = document.getElementById("panel-" + p);
+    if (panel) panel.classList.toggle("active", p === id);
+  });
+  document.querySelectorAll(".sb-item").forEach(function(n) {
+    n.classList.toggle("active", n.dataset.panel === id);
+  });
+  var titles = {
+    dashboard: "Dashboard",
+    hero: "Hero Section",
+    kinetic: "Kinetic Text",
+    about: "About & Founder",
+    services: "Services",
+    contact: "Contact & Footer",
+    blog: "Blog / Insights",
+    settings: "Settings"
+  };
+  document.getElementById("topbarTitle").textContent = titles[id] || id;
+  if (id === "blog") renderPostList();
+  if (id === "dashboard") renderDashPosts();
+  if (id === "settings") {
+    var tok = getToken();
+    document.getElementById("tokenAlert").style.display = tok ? "none" : "block";
+    document.getElementById("tokenOkAlert").style.display = tok ? "block" : "none";
+    document.getElementById("tokenStatusDesc").textContent = tok ?
+      "Token saved: " + tok.substring(0, 8) + "..." :
+      "Required for publish. Classic token, repo scope, no expiry.";
   }
 }
 
-function removeTS(str){
-  var start=str.indexOf("<!-- ts:");
-  if(start<0) return str;
-  var end=str.indexOf("-->",start);
-  if(end<0) return str;
-  return str.slice(0,start)+str.slice(end+3);
+/* ══════════════════════════════════════════
+   DATA LOADING
+══════════════════════════════════════════ */
+async function reloadFromGitHub() {
+  setPublishStatus("loading", "Loading...");
+  var token = getToken();
+  var url = "https://raw.githubusercontent.com/" + CFG.ghUser + "/" + CFG.ghRepo + "/" + CFG.ghBranch + "/" + CFG.dataFile + "?t=" + Date.now();
+  try {
+    var res = await fetch(url);
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    var json = await res.json();
+    mergeData(json);
+    populateFields();
+    renderPostList();
+    renderDashPosts();
+    updatePostCount();
+    setPublishStatus("live", "Live");
+    toast("Content loaded from GitHub.", "green");
+    return true;
+  } catch(e) {
+    /* Fall back to local draft */
+    var local = localStorage.getItem("numics_draft");
+    if (local) {
+      try {
+        mergeData(JSON.parse(local));
+        populateFields();
+        renderPostList();
+        renderDashPosts();
+        updatePostCount();
+        toast("GitHub unavailable — loaded local draft.", "yellow");
+      } catch(e2) {}
+    } else {
+      populateFields();
+    }
+    setPublishStatus("offline", "Offline");
+    return false;
+  }
 }
 
-function exportSite(){
+function mergeData(src) {
+  if (!src) return;
+  if (src.hero) Object.assign(DATA.hero, src.hero);
+  if (src.kinetic) {
+    if (src.kinetic.stmts) DATA.kinetic.stmts = src.kinetic.stmts;
+    if (src.kinetic.finalTop !== undefined) DATA.kinetic.finalTop = src.kinetic.finalTop;
+    if (src.kinetic.finalBot !== undefined) DATA.kinetic.finalBot = src.kinetic.finalBot;
+  }
+  if (src.about) Object.assign(DATA.about, src.about);
+  if (src.services) {
+    if (src.services.d1Discs) DATA.services.d1Discs = src.services.d1Discs;
+    if (src.services.d2Discs) DATA.services.d2Discs = src.services.d2Discs;
+    var svKeys = ["d1Name","d1Sub","d2Name","d2Sub","converge"];
+    svKeys.forEach(function(k) { if (src.services[k] !== undefined) DATA.services[k] = src.services[k]; });
+  }
+  if (src.contact) Object.assign(DATA.contact, src.contact);
+  if (src.posts) DATA.posts = src.posts;
+}
+
+/* ══════════════════════════════════════════
+   POPULATE FIELDS
+══════════════════════════════════════════ */
+function sv(id, val) { var el = document.getElementById(id); if (el) el.value = val || ""; }
+function gv(id) { var el = document.getElementById(id); return el ? el.value : ""; }
+
+function populateFields() {
+  /* Hero */
+  sv("h-pre", DATA.hero.pre);
+  sv("h-tag", DATA.hero.tag);
+  sv("h-cta", DATA.hero.cta);
+  sv("h-link", DATA.hero.link);
+  sv("h-navcta", DATA.hero.navcta || "");
+  sv("h-video", DATA.hero.video);
+  var opEl = document.getElementById("h-opacity");
+  if (opEl) { opEl.value = DATA.hero.videoOpacity || "0.55"; document.getElementById("h-opacity-val").textContent = opEl.value; }
+  if (DATA.hero.bgImg) showImgPreview("h-bg-img", DATA.hero.bgImg, "hBgPrev", "hBgDrop", "hBgClear");
+  if (DATA.hero.logo) showImgPreview("h-logo-img", DATA.hero.logo, "hLogoPrev", "hLogoDrop", "hLogoClear");
+
+  /* Kinetic */
+  buildKtList();
+  sv("kt-final-top", DATA.kinetic.finalTop);
+  sv("kt-final-bot", DATA.kinetic.finalBot);
+
+  /* About */
+  sv("ab-h1", DATA.about.h1);
+  sv("ab-h2", DATA.about.h2);
+  sv("ab-s1n", DATA.about.s1n);
+  sv("ab-s1l", DATA.about.s1l);
+  sv("ab-s2n", DATA.about.s2n);
+  sv("ab-s2l", DATA.about.s2l);
+  sv("ab-p1", DATA.about.p1);
+  sv("ab-p2", DATA.about.p2);
+  sv("ab-pull", DATA.about.pull);
+  sv("ab-fw-ey", DATA.about.fwEy);
+  sv("ab-fw-h", DATA.about.fwH);
+  sv("ab-fw-p1", DATA.about.fwP1);
+  sv("ab-fw-p2", DATA.about.fwP2);
+  sv("ab-fw-p3", DATA.about.fwP3);
+  if (DATA.about.img1) showImgPreview("ab-img1", DATA.about.img1, "abImg1Prev", "abImg1Drop", "abImg1Clear");
+  if (DATA.about.img2) showImgPreview("ab-img2", DATA.about.img2, "abImg2Prev", "abImg2Drop", "abImg2Clear");
+
+  /* Services */
+  sv("sv-d1-name", DATA.services.d1Name);
+  sv("sv-d1-sub", DATA.services.d1Sub);
+  sv("sv-d2-name", DATA.services.d2Name);
+  sv("sv-d2-sub", DATA.services.d2Sub);
+  sv("sv-converge", DATA.services.converge);
+  buildDiscLists();
+
+  /* Contact */
+  sv("ct-eyebrow", DATA.contact.eyebrow || "Contact");
+  sv("ct-h", DATA.contact.h);
+  sv("ct-sub", DATA.contact.sub);
+  sv("ct-btn", DATA.contact.btn);
+  sv("ct-link", DATA.contact.link);
+  sv("ct-email", DATA.contact.email);
+  sv("ct-li", DATA.contact.li);
+  sv("ct-loc", DATA.contact.loc);
+  sv("ct-copy", DATA.contact.copy);
+
+  dirtyPanels = {};
+  updateAllDots();
+}
+
+/* ══════════════════════════════════════════
+   BUILD DYNAMIC LISTS
+══════════════════════════════════════════ */
+function buildKtList() {
+  var c = document.getElementById("kt-list");
+  if (!c) return;
+  var html = "";
+  DATA.kinetic.stmts.forEach(function(s, i) {
+    html += "<div class=\"kt-row-item\">";
+    html += "<span class=\"kt-num\">0" + (i + 1) + "</span>";
+    html += "<input class=\"kt-inp\" id=\"kt-l-" + i + "\" value=\"" + esc(s.l) + "\" placeholder=\"Left word\" oninput=\"markDirty('kinetic')\">";
+    html += "<input class=\"kt-inp\" id=\"kt-r-" + i + "\" value=\"" + esc(s.r) + "\" placeholder=\"Right word (green)\" oninput=\"markDirty('kinetic')\">";
+    html += "</div>";
+  });
+  c.innerHTML = html;
+}
+
+function buildDiscLists() {
+  buildOneDiscList("sv-d1-discs", DATA.services.d1Discs, 1);
+  buildOneDiscList("sv-d2-discs", DATA.services.d2Discs, 2);
+}
+
+function buildOneDiscList(cid, discs, d) {
+  var c = document.getElementById(cid);
+  if (!c) return;
+  var html = "<div style=\"margin-bottom:6px;font-size:10px;color:var(--dim)\">Name / Service area → Tags / Frameworks (dot-separated)</div>";
+  discs.forEach(function(disc, i) {
+    html += "<div class=\"disc-item\">";
+    html += "<span class=\"kt-num\">0" + (i + 1) + "</span>";
+    html += "<input class=\"kt-inp\" id=\"sv-d" + d + "-disc-" + i + "-name\" value=\"" + esc(disc.name) + "\" placeholder=\"Service name\" oninput=\"markDirty('services')\">";
+    html += "<input class=\"kt-inp\" id=\"sv-d" + d + "-disc-" + i + "-tags\" value=\"" + esc(disc.tags) + "\" placeholder=\"Tags (e.g. EU Taxonomy · CSRD)\" oninput=\"markDirty('services')\">";
+    html += "</div>";
+  });
+  c.innerHTML = html;
+}
+
+function esc(str) {
+  if (!str) return "";
+  return str.replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+/* ══════════════════════════════════════════
+   COLLECT DATA FROM FIELDS
+══════════════════════════════════════════ */
+function collectData() {
+  DATA.hero.pre = gv("h-pre");
+  DATA.hero.tag = gv("h-tag");
+  DATA.hero.cta = gv("h-cta");
+  DATA.hero.link = gv("h-link");
+  DATA.hero.navcta = gv("h-navcta");
+  DATA.hero.video = gv("h-video");
+  DATA.hero.videoOpacity = gv("h-opacity") || "0.55";
+  DATA.hero.bgImg = gv("h-bg-img");
+  DATA.hero.logo = gv("h-logo-img");
+
+  DATA.kinetic.stmts.forEach(function(s, i) {
+    s.l = gv("kt-l-" + i);
+    s.r = gv("kt-r-" + i);
+  });
+  DATA.kinetic.finalTop = gv("kt-final-top");
+  DATA.kinetic.finalBot = gv("kt-final-bot");
+
+  DATA.about.h1 = gv("ab-h1");
+  DATA.about.h2 = gv("ab-h2");
+  DATA.about.s1n = gv("ab-s1n");
+  DATA.about.s1l = gv("ab-s1l");
+  DATA.about.s2n = gv("ab-s2n");
+  DATA.about.s2l = gv("ab-s2l");
+  DATA.about.p1 = gv("ab-p1");
+  DATA.about.p2 = gv("ab-p2");
+  DATA.about.pull = gv("ab-pull");
+  DATA.about.fwEy = gv("ab-fw-ey");
+  DATA.about.fwH = gv("ab-fw-h");
+  DATA.about.fwP1 = gv("ab-fw-p1");
+  DATA.about.fwP2 = gv("ab-fw-p2");
+  DATA.about.fwP3 = gv("ab-fw-p3");
+  DATA.about.img1 = gv("ab-img1");
+  DATA.about.img2 = gv("ab-img2");
+
+  DATA.services.d1Name = gv("sv-d1-name");
+  DATA.services.d1Sub = gv("sv-d1-sub");
+  DATA.services.d2Name = gv("sv-d2-name");
+  DATA.services.d2Sub = gv("sv-d2-sub");
+  DATA.services.converge = gv("sv-converge");
+  DATA.services.d1Discs.forEach(function(d, i) {
+    d.name = gv("sv-d1-disc-" + i + "-name");
+    d.tags = gv("sv-d1-disc-" + i + "-tags");
+  });
+  DATA.services.d2Discs.forEach(function(d, i) {
+    d.name = gv("sv-d2-disc-" + i + "-name");
+    d.tags = gv("sv-d2-disc-" + i + "-tags");
+  });
+
+  DATA.contact.eyebrow = gv("ct-eyebrow");
+  DATA.contact.h = gv("ct-h");
+  DATA.contact.sub = gv("ct-sub");
+  DATA.contact.btn = gv("ct-btn");
+  DATA.contact.link = gv("ct-link");
+  DATA.contact.email = gv("ct-email");
+  DATA.contact.li = gv("ct-li");
+  DATA.contact.loc = gv("ct-loc");
+  DATA.contact.copy = gv("ct-copy");
+}
+
+/* ══════════════════════════════════════════
+   SAVE / PUBLISH
+══════════════════════════════════════════ */
+function saveLocal() {
   collectData();
-  var a=document.createElement("a");
-  a.href="data:application/json;charset=utf-8,"+encodeURIComponent(JSON.stringify(DATA,null,2));
-  a.download="numics-data.json";
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  toast("numics-data.json downloaded.");
+  localStorage.setItem("numics_draft", JSON.stringify(DATA));
+  var now = new Date().toLocaleTimeString("en-GB", {hour:"2-digit",minute:"2-digit"});
+  localStorage.setItem("numics_saved", now);
+  document.getElementById("ds-saved").textContent = now;
+  dirtyPanels = {};
+  updateAllDots();
+  toast("Draft saved locally.", "green");
 }
 
-function handleImg(input,hiddenId,prevId){
-  var file=input.files[0]; if(!file) return;
-  var reader=new FileReader();
-  reader.onload=function(e){
-    var val=e.target.result;
-    var h=document.getElementById(hiddenId); if(h) h.value=val;
-    var p=document.getElementById(prevId); if(p){p.src=val;p.style.display="block";}
-    if(hiddenId==="h-bg-img") DATA.hero.bgImg=val;
-    if(hiddenId==="h-logo-img") DATA.hero.logo=val;
-    if(hiddenId==="ab-img1")  DATA.about.img1=val;
-    if(hiddenId==="ab-img2")  DATA.about.img2=val;
+async function publishToGitHub() {
+  var token = getToken();
+  if (!token) {
+    toast("No token set. Click Token to add one.", "yellow");
+    openTokenModal();
+    return;
+  }
+  collectData();
+  var btn = document.getElementById("publishBtn");
+  btn.textContent = "Publishing...";
+  btn.disabled = true;
+  setPublishStatus("saving", "Publishing...");
+
+  try {
+    var content = JSON.stringify(DATA, null, 2);
+    var encoded = btoa(unescape(encodeURIComponent(content)));
+    var sha = await getFileSha(CFG.dataFile, token);
+
+    var body = {message: "CMS: update content " + new Date().toISOString(), content: encoded, branch: CFG.ghBranch};
+    if (sha) body.sha = sha;
+
+    var res = await fetch("https://api.github.com/repos/" + CFG.ghUser + "/" + CFG.ghRepo + "/contents/" + CFG.dataFile, {
+      method: "PUT",
+      headers: {
+        "Authorization": "token " + token,
+        "Accept": "application/vnd.github.v3+json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(body)
+    });
+
+    if (!res.ok) {
+      var err = await res.json();
+      throw new Error(err.message || "Write failed");
+    }
+
+    /* Touch index.html to trigger redeploy */
+    await touchIndexHtml(token);
+
+    var now = new Date().toLocaleTimeString("en-GB", {hour:"2-digit",minute:"2-digit"});
+    localStorage.setItem("numics_published", now);
+    localStorage.setItem("numics_draft", JSON.stringify(DATA));
+    localStorage.setItem("numics_saved", now);
+    document.getElementById("ds-saved").textContent = now;
+    document.getElementById("ds-pub").textContent = now;
+    dirtyPanels = {};
+    updateAllDots();
+    setPublishStatus("live", "Live");
+    btn.textContent = "Live!";
+    btn.style.background = "var(--green)";
+    setTimeout(function() { btn.textContent = "Publish Live"; btn.style.background = ""; btn.disabled = false; }, 3500);
+    toast("Published. Site updates in ~60 seconds.", "green");
+  } catch(e) {
+    btn.textContent = "Publish Live";
+    btn.style.background = "";
+    btn.disabled = false;
+    setPublishStatus("offline", "Error");
+    toast("Publish failed: " + e.message, "red");
+  }
+}
+
+async function getFileSha(path, token) {
+  try {
+    var res = await fetch("https://api.github.com/repos/" + CFG.ghUser + "/" + CFG.ghRepo + "/contents/" + path, {
+      headers: {"Authorization": "token " + token, "Accept": "application/vnd.github.v3+json"}
+    });
+    if (!res.ok) return null;
+    var d = await res.json();
+    return d.sha || null;
+  } catch(e) { return null; }
+}
+
+async function touchIndexHtml(token) {
+  try {
+    var res = await fetch("https://api.github.com/repos/" + CFG.ghUser + "/" + CFG.ghRepo + "/contents/index.html", {
+      headers: {"Authorization": "token " + token, "Accept": "application/vnd.github.v3+json"}
+    });
+    if (!res.ok) return;
+    var d = await res.json();
+    var raw = atob(d.content.replace(/\n/g, ""));
+    var decoded = decodeURIComponent(escape(raw));
+    var ts = "<!-- cms:" + Date.now() + " -->";
+    var stripped = decoded.replace(/<!-- cms:\d+ -->/g, "");
+    var updated = stripped + ts;
+    var reencoded = btoa(unescape(encodeURIComponent(updated)));
+    await fetch("https://api.github.com/repos/" + CFG.ghUser + "/" + CFG.ghRepo + "/contents/index.html", {
+      method: "PUT",
+      headers: {
+        "Authorization": "token " + token,
+        "Accept": "application/vnd.github.v3+json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        message: "CMS: trigger rebuild " + Date.now(),
+        content: reencoded,
+        sha: d.sha,
+        branch: CFG.ghBranch
+      })
+    });
+  } catch(e) {}
+}
+
+function exportData() {
+  collectData();
+  var a = document.createElement("a");
+  a.href = "data:application/json;charset=utf-8," + encodeURIComponent(JSON.stringify(DATA, null, 2));
+  a.download = "numics-data.json";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  toast("numics-data.json downloaded.", "green");
+}
+
+function clearLocalDraft() {
+  if (!confirm("Clear local draft? This removes your unsaved changes from this browser. The live site is not affected.")) return;
+  localStorage.removeItem("numics_draft");
+  localStorage.removeItem("numics_saved");
+  reloadFromGitHub();
+  toast("Local draft cleared. Reloading from GitHub.", "yellow");
+}
+
+/* ══════════════════════════════════════════
+   DIRTY STATE
+══════════════════════════════════════════ */
+function markDirty(panel) {
+  dirtyPanels[panel] = true;
+  var dot = document.getElementById("dot-" + panel);
+  if (dot) dot.classList.add("show");
+}
+
+function updateAllDots() {
+  ["hero","kinetic","about","services","contact"].forEach(function(p) {
+    var dot = document.getElementById("dot-" + p);
+    if (dot) dot.classList.toggle("show", !!dirtyPanels[p]);
+  });
+}
+
+/* ══════════════════════════════════════════
+   IMAGE HANDLING
+══════════════════════════════════════════ */
+function handleImgDrop(input, hiddenId, prevId, dropId, clearId) {
+  var file = input.files[0];
+  if (!file) return;
+  var maxMB = 4;
+  if (file.size > maxMB * 1024 * 1024) {
+    toast("Image too large. Max " + maxMB + "MB.", "red");
+    return;
+  }
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var val = e.target.result;
+    var h = document.getElementById(hiddenId);
+    if (h) h.value = val;
+    showImgPreview(hiddenId, val, prevId, dropId, clearId);
+    /* Map to DATA fields */
+    if (hiddenId === "h-bg-img") DATA.hero.bgImg = val;
+    else if (hiddenId === "h-logo-img") DATA.hero.logo = val;
+    else if (hiddenId === "ab-img1") DATA.about.img1 = val;
+    else if (hiddenId === "ab-img2") DATA.about.img2 = val;
+    else if (hiddenId === "ed-img") { if (currentPost) currentPost.img = val; }
+    /* Mark section dirty */
+    if (hiddenId.startsWith("h-")) markDirty("hero");
+    else if (hiddenId.startsWith("ab-")) markDirty("about");
   };
   reader.readAsDataURL(file);
 }
 
-var editingPost=null;
+function showImgPreview(hiddenId, val, prevId, dropId, clearId) {
+  var prev = document.getElementById(prevId);
+  if (prev) { prev.src = val; prev.style.display = "block"; }
+  var drop = document.getElementById(dropId);
+  if (drop) drop.classList.add("has-img");
+  var clear = document.getElementById(clearId);
+  if (clear) clear.style.display = "inline-block";
+  var h = document.getElementById(hiddenId);
+  if (h && !h.value) h.value = val;
+}
 
-function renderPosts(){
-  var list=document.getElementById("post-list"); if(!list) return;
-  if(!DATA.posts.length){
-    list.innerHTML="<div style=\"padding:20px;text-align:center;color:#9CA3AF;font-size:13px\">No posts yet.</div>";
+function clearImg(hiddenId, prevId, dropId, clearId) {
+  var h = document.getElementById(hiddenId); if (h) h.value = "";
+  var prev = document.getElementById(prevId); if (prev) { prev.src = ""; prev.style.display = "none"; }
+  var drop = document.getElementById(dropId); if (drop) drop.classList.remove("has-img");
+  var clear = document.getElementById(clearId); if (clear) clear.style.display = "none";
+  if (hiddenId === "h-bg-img") DATA.hero.bgImg = "";
+  else if (hiddenId === "h-logo-img") DATA.hero.logo = "";
+  else if (hiddenId === "ab-img1") DATA.about.img1 = "";
+  else if (hiddenId === "ab-img2") DATA.about.img2 = "";
+  else if (hiddenId === "ed-img") { if (currentPost) currentPost.img = ""; }
+  markDirty("hero");
+}
+
+/* ══════════════════════════════════════════
+   BLOG / POSTS
+══════════════════════════════════════════ */
+function renderPostList() {
+  var c = document.getElementById("post-list-container");
+  if (!c) return;
+  if (!DATA.posts.length) {
+    c.innerHTML = "<div class=\"empty-state\"><div class=\"empty-state-icon\">✦</div><div class=\"empty-state-text\">No articles yet</div><div class=\"empty-state-sub\">Click \"+ New Article\" above to write your first insight</div></div>";
     return;
   }
-  list.innerHTML=DATA.posts.map(function(p){
-    return "<div class=\"post-item\"><div><div class=\"post-item-title\">"+(p.title||"Untitled")+"</div>"
-      +"<div class=\"post-item-meta\">"+(p.cat||"")+" "+(p.date||"")+"</div></div>"
-      +"<button onclick=\"openEditor("+p.id+")\" style=\"font-size:11px;font-weight:600;color:#22C55E;cursor:pointer;background:none;border:none\">Edit</button></div>";
+  var rows = DATA.posts.map(function(p, i) {
+    return "<tr><td class=\"post-title-cell\">" + esc(p.title || "Untitled") + "</td>" +
+      "<td><span class=\"post-cat-badge\">" + esc(p.cat || "Article") + "</span></td>" +
+      "<td class=\"post-meta\">" + esc(p.date || "—") + "</td>" +
+      "<td class=\"post-meta\">" + esc(p.time || "—") + "</td>" +
+      "<td><button class=\"btn btn-secondary btn-sm\" onclick=\"openEditor('" + p.id + "')\">Edit</button></td></tr>";
   }).join("");
+  c.innerHTML = "<table class=\"post-table\"><thead><tr><th>Title</th><th>Category</th><th>Date</th><th>Read time</th><th></th></tr></thead><tbody>" + rows + "</tbody></table>";
+  updatePostCount();
 }
 
-function openEditor(id){
-  if(id){
-    editingPost=DATA.posts.find(function(p){ return p.id===id; });
-  }else{
-    editingPost={id:Date.now(),title:"",cat:"",date:"",time:"",url:"",excerpt:"",img:"",body:""};
-    DATA.posts.push(editingPost);
+function renderDashPosts() {
+  var c = document.getElementById("dash-posts-list");
+  if (!c) return;
+  if (!DATA.posts.length) {
+    c.innerHTML = "<div class=\"empty-state\"><div class=\"empty-state-icon\">✦</div><div class=\"empty-state-text\">No posts yet</div><div class=\"empty-state-sub\">Go to Blog / Insights to add your first article</div></div>";
+    return;
   }
-  sv("ed-title",editingPost.title); sv("ed-cat",editingPost.cat);
-  sv("ed-date",editingPost.date);   sv("ed-time",editingPost.time);
-  sv("ed-url",editingPost.url);     sv("ed-excerpt",editingPost.excerpt);
-  setRteContent(editingPost.body||"");
-  if(editingPost.img) showPrev("ed-img-prev",editingPost.img);
-  document.getElementById("editorOverlay").style.display="flex";
-  document.getElementById("edDelBtn").style.display=id?"block":"none";
+  var recent = DATA.posts.slice(-5).reverse();
+  var rows = recent.map(function(p) {
+    return "<div style=\"display:flex;align-items:center;justify-content:space-between;padding:10px 18px;border-bottom:1px solid var(--line);gap:12px\">" +
+      "<div><div style=\"font-size:12px;font-weight:600\">" + esc(p.title || "Untitled") + "</div>" +
+      "<div style=\"font-size:10px;color:var(--dim);margin-top:2px\">" + esc(p.cat || "") + " · " + esc(p.date || "—") + "</div></div>" +
+      "<button class=\"btn btn-secondary btn-sm\" onclick=\"goPanel('blog');openEditor('" + p.id + "')\">Edit</button></div>";
+  }).join("");
+  c.innerHTML = rows;
 }
 
-function closeEditor(){
-  document.getElementById("editorOverlay").style.display="none";
-  editingPost=null; renderPosts();
+function updatePostCount() {
+  var n = DATA.posts.length;
+  var badge = document.getElementById("postCountBadge");
+  if (badge) badge.textContent = n;
+  var ds = document.getElementById("ds-posts");
+  if (ds) ds.textContent = n;
+  var lbl = document.getElementById("postCountLabel");
+  if (lbl) lbl.textContent = n === 0 ? "No posts yet" : n + " article" + (n === 1 ? "" : "s");
 }
 
-function savePost(){
-  if(!editingPost) return;
-  editingPost.title=gv("ed-title"); editingPost.cat=gv("ed-cat");
-  editingPost.date=gv("ed-date");   editingPost.time=gv("ed-time");
-  editingPost.url=gv("ed-url");     editingPost.excerpt=gv("ed-excerpt");
-  editingPost.body=getRteContent(); editingPost.img=gv("ed-img");
-  var dsp=document.getElementById("ds-posts"); if(dsp) dsp.textContent=DATA.posts.length;
-  closeEditor(); toast("Post saved. Click Publish Live to update site.");
+/* ══════════════════════════════════════════
+   ARTICLE EDITOR
+══════════════════════════════════════════ */
+function openEditor(idOrNull) {
+  var post;
+  if (idOrNull === null || idOrNull === undefined) {
+    post = {
+      id: "post_" + Date.now(),
+      title: "", cat: "Regulatory Analysis", date: "", time: "",
+      url: "", excerpt: "", seo: "", tags: "", img: "", imgAlt: "", body: ""
+    };
+    currentPost = post;
+    document.getElementById("editorTitle").textContent = "New Article";
+    document.getElementById("edDelBtn").style.display = "none";
+  } else {
+    var found = null;
+    for (var i = 0; i < DATA.posts.length; i++) {
+      if (String(DATA.posts[i].id) === String(idOrNull)) { found = DATA.posts[i]; break; }
+    }
+    if (!found) { toast("Post not found.", "red"); return; }
+    post = found;
+    currentPost = post;
+    document.getElementById("editorTitle").textContent = "Edit: " + (post.title || "Untitled");
+    document.getElementById("edDelBtn").style.display = "block";
+  }
+  sv("ed-title", post.title);
+  sv("ed-cat", post.cat);
+  sv("ed-date", post.date);
+  sv("ed-time", post.time);
+  sv("ed-url", post.url);
+  sv("ed-excerpt", post.excerpt);
+  sv("ed-seo", post.seo || "");
+  sv("ed-tags", post.tags || "");
+  sv("ed-img-alt", post.imgAlt || "");
+  var rte = document.getElementById("rte");
+  if (rte) rte.innerHTML = post.body || "";
+  if (post.img) {
+    showImgPreview("ed-img", post.img, "edCoverPrev", "edCoverDrop", "edCoverClear");
+  } else {
+    clearImg("ed-img", "edCoverPrev", "edCoverDrop", "edCoverClear");
+  }
+  /* Reset to first tab */
+  document.querySelectorAll(".modal-tab").forEach(function(t) { t.classList.remove("active"); });
+  document.querySelectorAll(".modal-tab-panel").forEach(function(p) { p.classList.remove("active"); });
+  document.querySelector(".modal-tab").classList.add("active");
+  document.getElementById("ed-tab-meta").classList.add("active");
+  updateRteWordCount();
+  document.getElementById("editorOverlay").classList.add("open");
+  document.body.style.overflow = "hidden";
 }
 
-function deletePost(){
-  if(!editingPost||!confirm("Delete this post?")) return;
-  DATA.posts=DATA.posts.filter(function(p){ return p.id!==editingPost.id; });
-  var dsp=document.getElementById("ds-posts"); if(dsp) dsp.textContent=DATA.posts.length;
+function closeEditor() {
+  document.getElementById("editorOverlay").classList.remove("open");
+  document.body.style.overflow = "";
+  currentPost = null;
+}
+
+function savePost() {
+  var post = currentPost;
+  if (!post) return;
+  if (!gv("ed-title").trim()) {
+    toast("Please enter an article title.", "yellow");
+    return;
+  }
+  post.title = gv("ed-title");
+  post.cat = gv("ed-cat");
+  post.date = gv("ed-date");
+  post.time = gv("ed-time");
+  post.url = gv("ed-url");
+  post.excerpt = gv("ed-excerpt");
+  post.seo = gv("ed-seo");
+  post.tags = gv("ed-tags");
+  post.imgAlt = gv("ed-img-alt");
+  post.img = gv("ed-img");
+  var rte = document.getElementById("rte");
+  post.body = rte ? rte.innerHTML : "";
+
+  /* Add to posts array if new */
+  var exists = false;
+  for (var i = 0; i < DATA.posts.length; i++) {
+    if (String(DATA.posts[i].id) === String(post.id)) { DATA.posts[i] = post; exists = true; break; }
+  }
+  if (!exists) DATA.posts.push(post);
+
+  updatePostCount();
   closeEditor();
+  renderPostList();
+  renderDashPosts();
+  toast("Article saved. Click Publish Live to update the site.", "green");
 }
 
-function rteWrap(before,after){
-  var ta=document.getElementById("ed-rte");
-  var start=ta.selectionStart, end=ta.selectionEnd;
-  var sel=ta.value.substring(start,end);
-  ta.value=ta.value.substring(0,start)+before+sel+after+ta.value.substring(end);
-  ta.focus();
+function deletePost() {
+  if (!currentPost) return;
+  if (!confirm("Delete this article? This cannot be undone.")) return;
+  DATA.posts = DATA.posts.filter(function(p) { return String(p.id) !== String(currentPost.id); });
+  updatePostCount();
+  closeEditor();
+  renderPostList();
+  renderDashPosts();
+  toast("Article deleted.", "yellow");
 }
-function rteCmd(cmd,val){ rteWrap("",""); }
-function rteBlock(tag){ rteWrap("",""); }
-function getRteContent(){ return document.getElementById("ed-rte").value; }
-function setRteContent(h){ var el=document.getElementById("ed-rte"); if(el) el.value=h||""; }
-function showPrev(pid,src){ var el=document.getElementById(pid); if(el&&src){el.src=src;el.style.display="block";} }
 
-function toast(msg){
-  var el=document.getElementById("toast");
-  document.getElementById("toastMsg").textContent=msg;
+function switchEdTab(el, panelId) {
+  document.querySelectorAll(".modal-tab").forEach(function(t) { t.classList.remove("active"); });
+  document.querySelectorAll(".modal-tab-panel").forEach(function(p) { p.classList.remove("active"); });
+  el.classList.add("active");
+  document.getElementById(panelId).classList.add("active");
+}
+
+/* ══════════════════════════════════════════
+   RICH TEXT EDITOR
+══════════════════════════════════════════ */
+function execCmd(cmd, val) {
+  document.getElementById("rte").focus();
+  document.execCommand(cmd, false, val || null);
+  updateRteWordCount();
+}
+
+function insertRteLink() {
+  var url = prompt("Enter URL:", "https://");
+  if (url) {
+    document.getElementById("rte").focus();
+    document.execCommand("createLink", false, url);
+  }
+}
+
+function insertRteImage(input) {
+  var file = input.files[0];
+  if (!file) return;
+  if (file.size > 4 * 1024 * 1024) { toast("Image too large. Max 4MB.", "red"); return; }
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    document.getElementById("rte").focus();
+    document.execCommand("insertImage", false, e.target.result);
+    input.value = "";
+    updateRteWordCount();
+  };
+  reader.readAsDataURL(file);
+}
+
+function updateRteWordCount() {
+  var rte = document.getElementById("rte");
+  var el = document.getElementById("rteCharCount");
+  if (!rte || !el) return;
+  var text = rte.innerText || rte.textContent || "";
+  var words = text.trim().split(/\s+/).filter(function(w) { return w.length > 0; }).length;
+  var chars = text.length;
+  el.textContent = words + " words · " + chars + " characters";
+}
+
+/* ══════════════════════════════════════════
+   TOKEN MANAGEMENT
+══════════════════════════════════════════ */
+function getToken() { return localStorage.getItem("numics_token") || ""; }
+
+function openTokenModal() {
+  var input = document.getElementById("gh-token-input");
+  if (input) input.value = getToken();
+  document.getElementById("tokenSavedMsg").textContent = "";
+  document.getElementById("tokenVerifyMsg").textContent = "";
+  document.getElementById("tokenOverlay").classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+
+function closeTokenModal() {
+  document.getElementById("tokenOverlay").classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+function saveToken() {
+  var t = document.getElementById("gh-token-input").value.trim();
+  if (!t) { toast("Please enter your GitHub token.", "yellow"); return; }
+  localStorage.setItem("numics_token", t);
+  document.getElementById("tokenSavedMsg").textContent = "Saved: " + t.substring(0, 8) + "...";
+  document.getElementById("tokenSavedMsg").className = "field-hint ok";
+  updateTokenUI();
+  closeTokenModal();
+  toast("GitHub token saved.", "green");
+}
+
+async function verifyToken() {
+  var t = document.getElementById("gh-token-input").value.trim();
+  var msg = document.getElementById("tokenVerifyMsg");
+  if (!t) { msg.textContent = "Enter a token first."; msg.className = "field-hint warn"; return; }
+  msg.textContent = "Testing...";
+  msg.className = "field-hint";
+  try {
+    var res = await fetch("https://api.github.com/repos/" + CFG.ghUser + "/" + CFG.ghRepo, {
+      headers: {"Authorization": "token " + t, "Accept": "application/vnd.github.v3+json"}
+    });
+    if (res.ok) {
+      var d = await res.json();
+      msg.textContent = "Connected. Repo: " + d.full_name;
+      msg.className = "field-hint ok";
+    } else {
+      msg.textContent = "Connection failed. Check the token and its permissions.";
+      msg.className = "field-hint warn";
+    }
+  } catch(e) {
+    msg.textContent = "Error: " + e.message;
+    msg.className = "field-hint warn";
+  }
+}
+
+function updateTokenUI() {
+  var tok = getToken();
+  var dot = document.getElementById("sbTokenDot");
+  var lbl = document.getElementById("sbTokenLabel");
+  if (tok) {
+    if (dot) dot.classList.add("ok");
+    if (lbl) lbl.textContent = "Token: " + tok.substring(0, 8) + "...";
+  } else {
+    if (dot) dot.classList.remove("ok");
+    if (lbl) lbl.textContent = "No token — set in Settings";
+  }
+}
+
+/* ══════════════════════════════════════════
+   PUBLISH STATUS
+══════════════════════════════════════════ */
+function setPublishStatus(state, label) {
+  var dot = document.getElementById("publishDot");
+  var lbl = document.getElementById("publishLabel");
+  if (dot) {
+    dot.classList.remove("live","saving");
+    if (state === "live") dot.classList.add("live");
+    else if (state === "saving") dot.classList.add("saving");
+  }
+  if (lbl) lbl.textContent = label;
+}
+
+/* ══════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════ */
+function toast(msg, type) {
+  var el = document.getElementById("toast");
+  var dot = document.getElementById("toastDot");
+  var txt = document.getElementById("toastMsg");
+  txt.textContent = msg;
+  dot.className = "toast-dot";
+  if (type === "red") dot.classList.add("red");
+  else if (type === "yellow") dot.classList.add("yellow");
+  else dot.classList.add("green");
   el.classList.add("show");
-  setTimeout(function(){ el.classList.remove("show"); },2800);
+  clearTimeout(el._t);
+  el._t = setTimeout(function() { el.classList.remove("show"); }, 3200);
 }
 
-function getToken(){ return localStorage.getItem("numics_gh_token")||""; }
-function saveToken(t){ localStorage.setItem("numics_gh_token",t); }
+/* ══════════════════════════════════════════
+   BOOT
+══════════════════════════════════════════ */
+document.addEventListener("DOMContentLoaded", function() {
+  /* Login on Enter */
+  var pw = document.getElementById("pwInput");
+  if (pw) pw.addEventListener("keydown", function(e) { if (e.key === "Enter") doLogin(); });
+  document.getElementById("loginBtn").addEventListener("click", doLogin);
 
-function openGHSettings(){
-  document.getElementById("gh-settings-overlay").style.display="flex";
-  var el=document.getElementById("gh-token-input");
-  if(el) el.value=getToken();
-}
-function closeGHSettings(){
-  document.getElementById("gh-settings-overlay").style.display="none";
-}
-function saveGHToken(){
-  var t=document.getElementById("gh-token-input").value.trim();
-  if(!t){ toast("Please enter your token."); return; }
-  saveToken(t);
-  var ts=document.getElementById("token-status");
-  if(ts){ ts.style.display="block"; ts.textContent="Token saved: "+t.substring(0,8)+"..."; }
-  closeGHSettings();
-  toast("Token saved! Click Publish Live to test.");
-  loadAll();
-}
-function openGHDocs(){
-  window.open("https://github.com/settings/tokens/new?scopes=repo&description=NUMICS+Admin","_blank");
-}
+  /* Close overlays on backdrop click */
+  document.getElementById("editorOverlay").addEventListener("click", function(e) {
+    if (e.target === this) closeEditor();
+  });
+  document.getElementById("tokenOverlay").addEventListener("click", function(e) {
+    if (e.target === this) closeTokenModal();
+  });
 
-document.addEventListener("DOMContentLoaded",function(){
-  var pw=document.getElementById("pwInput");
-  if(pw) pw.addEventListener("keydown",function(e){ if(e.key==="Enter") doLogin(); });
-  var eo=document.getElementById("editorOverlay");
-  if(eo) eo.addEventListener("click",function(e){ if(e.target===this) closeEditor(); });
-  var el=document.getElementById("gh-token-input");
-  if(el) el.value=getToken();
+  /* RTE word count */
+  var rte = document.getElementById("rte");
+  if (rte) {
+    rte.addEventListener("input", updateRteWordCount);
+    rte.addEventListener("keyup", updateRteWordCount);
+  }
+
+  /* Load last saved time */
+  var saved = localStorage.getItem("numics_saved");
+  if (saved) document.getElementById("ds-saved").textContent = saved;
+  var pub = localStorage.getItem("numics_published");
+  if (pub) document.getElementById("ds-pub").textContent = pub;
 });
-
 </script>
-
-<!-- GITHUB SETTINGS OVERLAY -->
-<div id="gh-settings-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:600;align-items:center;justify-content:center">
-  <div style="background:#fff;width:100%;max-width:440px;border-radius:10px;overflow:hidden;margin:24px">
-    <div style="padding:20px 24px;border-bottom:1px solid #E5E7EB;display:flex;align-items:center;justify-content:space-between">
-      <div style="font-size:14px;font-weight:700;color:#111">GitHub Settings</div>
-      <button onclick="closeGHSettings()" style="font-size:24px;color:#9CA3AF;cursor:pointer;background:none;border:none;line-height:1">x</button>
-    </div>
-    <div style="padding:24px;display:flex;flex-direction:column;gap:16px">
-      <div style="display:flex;flex-direction:column;gap:6px">
-        <label style="font-size:11px;font-weight:600;color:#6B7280">GitHub Personal Access Token (Classic - repo scope)</label>
-        <div id="token-status" style="font-size:11px;padding:6px 10px;border-radius:4px;background:#F0FDF4;color:#166534;display:none">Token saved</div>
-        <input id="gh-token-input" type="password" placeholder="ghp_xxxxxxxxxxxx" style="border:1.5px solid #E5E7EB;padding:10px 12px;font-size:13px;border-radius:4px;font-family:monospace">
-      </div>
-      <button onclick="openGHDocs()" style="font-size:11px;color:#22C55E;background:none;border:none;cursor:pointer;text-align:left;padding:0">Create a new GitHub token</button>
-      <button onclick="saveGHToken()" style="background:#111;color:#fff;border:none;padding:13px;font-size:13px;font-weight:700;cursor:pointer;border-radius:4px">Save Token</button>
-    </div>
-  </div>
-</div>
-
 </body>
 </html>
